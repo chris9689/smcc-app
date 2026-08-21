@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1347 851" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SMCC Vpass card">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00A94F"/>
+      <stop offset="0.55" stop-color="#008C3E"/>
+      <stop offset="1" stop-color="#00632C"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F6E7A8"/>
+      <stop offset="1" stop-color="#C9A227"/>
+    </linearGradient>
+  </defs>
+  <rect width="1347" height="851" rx="56" fill="url(#bg)"/>
+  <circle cx="1120" cy="140" r="360" fill="#ffffff" opacity="0.06"/>
+  <circle cx="240" cy="760" r="300" fill="#ffffff" opacity="0.05"/>
+  <text x="80" y="150" font-family="'Plus Jakarta Sans',sans-serif" font-size="82" font-weight="800" fill="#ffffff" letter-spacing="-1">Vpass</text>
+  <text x="1090" y="130" font-family="'Plus Jakarta Sans',sans-serif" font-size="46" font-weight="800" fill="#ffffff" letter-spacing="1" opacity="0.92">SMCC</text>
+  <rect x="120" y="300" width="150" height="115" rx="20" fill="url(#chip)"/>
+  <path d="M120 358 h150 M195 300 v115 M157 330 h38 M157 385 h38" stroke="#8a6d15" stroke-width="4" opacity="0.6" fill="none"/>
+  <g stroke="#ffffff" stroke-width="9" fill="none" opacity="0.85" stroke-linecap="round">
+    <path d="M330 320 a70 70 0 0 1 0 100"/>
+    <path d="M365 300 a105 105 0 0 1 0 140"/>
+    <path d="M400 282 a138 138 0 0 1 0 176"/>
+  </g>
+  <text x="80" y="720" font-family="'Plus Jakarta Sans',sans-serif" font-size="40" font-weight="700" fill="#ffffff" opacity="0.95" letter-spacing="3">•••• •••• •••• 4820</text>
+</svg>
