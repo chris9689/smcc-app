@@ -51,6 +51,10 @@ export interface MuseFlow {
   productIds?: string[];
   /** Optional FAQ id whose answer supplements the reply. */
   faqId?: string;
+  /** Optional follow-up question Muse asks after the reply. */
+  followUp?: string;
+  /** Optional follow-up prompt chips offered after the reply. */
+  followUpIds?: string[];
 }
 
 export const museProducts: MuseProduct[] = [
@@ -112,6 +116,8 @@ export const museFlows: MuseFlow[] = [
     answer:
       "Singapore is warm and humid year-round, so I’d go light and smart-casual. Here are a few breathable picks — and because you booked with your SMCC card, each one has cashback already applied.",
     productIds: ['m-blazer', 'm-polo', 'm-sneakers', 'm-sunglasses'],
+    followUp: 'Want me to sort out what to pack, or check your travel cashback first?',
+    followUpIds: ['flow-sg-pack', 'flow-cashback', 'flow-travel-cover'],
   },
   {
     id: 'flow-sg-pack',
@@ -121,6 +127,8 @@ export const museFlows: MuseFlow[] = [
     answer:
       'A few trip essentials I’d recommend for Singapore. The travel adapter uses Type G plugs, which you’ll need there. Cashback is shown per item.',
     productIds: ['m-carryon', 'm-adapter', 'm-powerbank', 'm-earbuds'],
+    followUp: 'Shall I show trending tech for the flight, or your Singapore dining cashback?',
+    followUpIds: ['flow-tech', 'flow-cashback'],
   },
   {
     id: 'flow-tech',
@@ -129,6 +137,8 @@ export const museFlows: MuseFlow[] = [
     keywords: ['tech', 'gadget', 'electronics', 'deal', 'earbuds', 'headphones', 'charger'],
     answer: 'Here’s what’s trending in tech right now, with card-linked cashback on each.',
     productIds: ['m-earbuds', 'm-powerbank', 'm-adapter'],
+    followUp: 'Want a gift idea too, or a hand redeeming your V Points?',
+    followUpIds: ['flow-gift', 'flow-points'],
   },
   {
     id: 'flow-gift',
@@ -137,6 +147,8 @@ export const museFlows: MuseFlow[] = [
     keywords: ['gift', 'present', 'under', 'budget', 'cheap', 'affordable'],
     answer: 'Great gift ideas under ¥10,000 — all with cashback when you pay with your SMCC card.',
     productIds: ['m-sunglasses', 'm-polo', 'm-powerbank'],
+    followUp: 'Need anything else — outfit ideas or packing help for your trip?',
+    followUpIds: ['flow-sg-outfit', 'flow-sg-pack'],
   },
   {
     id: 'flow-cashback',
@@ -146,6 +158,8 @@ export const museFlows: MuseFlow[] = [
     answer:
       'Right now your best live cashback is on travel and dining for your Singapore trip. Anything you buy through Muse below stacks card-linked cashback automatically — no codes to enter.',
     faqId: 'faq-cashback',
+    followUp: 'Want to start shopping those Singapore picks?',
+    followUpIds: ['flow-sg-outfit', 'flow-sg-pack', 'flow-tech'],
   },
   {
     id: 'flow-points',
@@ -154,6 +168,8 @@ export const museFlows: MuseFlow[] = [
     keywords: ['points', 'redeem', 'v points', 'balance', 'use points'],
     answer: 'Happy to help with V Points.',
     faqId: 'faq-points',
+    followUp: 'Anything else? I can check your cashback or travel cover.',
+    followUpIds: ['flow-cashback', 'flow-travel-cover'],
   },
   {
     id: 'flow-lost',
@@ -162,6 +178,8 @@ export const museFlows: MuseFlow[] = [
     keywords: ['lost', 'stolen', 'freeze', 'block', 'missing', 'fraud'],
     answer: 'Let’s secure your card right away.',
     faqId: 'faq-lost',
+    followUp: 'Would you like to see your latest statement, or check travel cover?',
+    followUpIds: ['flow-statement', 'flow-travel-cover'],
   },
   {
     id: 'flow-travel-cover',
@@ -170,6 +188,8 @@ export const museFlows: MuseFlow[] = [
     keywords: ['insurance', 'protection', 'cover', 'travel', 'lounge', 'abroad', 'overseas'],
     answer: 'Good question — travel is where your card does a lot of quiet work.',
     faqId: 'faq-travel',
+    followUp: 'Want lounge-ready travel picks, or your Singapore cashback?',
+    followUpIds: ['flow-sg-pack', 'flow-cashback'],
   },
   {
     id: 'flow-statement',
@@ -178,6 +198,8 @@ export const museFlows: MuseFlow[] = [
     keywords: ['statement', 'bill', 'transactions', 'history'],
     answer: 'Here’s how to find it.',
     faqId: 'faq-statement',
+    followUp: 'Anything else — redeeming V Points, or your live cashback?',
+    followUpIds: ['flow-points', 'flow-cashback'],
   },
 ];
 
@@ -189,6 +211,9 @@ export const museSuggestedFlowIds = [
   'flow-points',
   'flow-travel-cover',
 ];
+
+export const museFlowById = (id: string): MuseFlow | undefined =>
+  museFlows.find((f) => f.id === id);
 
 /**
  * Persona-aware proactive opening message. Demonstrates Muse proactively

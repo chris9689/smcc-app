@@ -10,6 +10,7 @@ import { formatYen } from '@/hooks/utils';
 import {
   museFlows,
   museFaqById,
+  museFlowById,
   museProductById,
   museSuggestedFlowIds,
   museGreeting,
@@ -24,6 +25,7 @@ interface MuseMessage {
   text: string;
   productIds?: string[];
   faqId?: string;
+  followUp?: string;
 }
 
 let msgSeq = 0;
@@ -34,12 +36,13 @@ export function MuseScreen() {
   const { appUser, appUserProfile } = useDemo();
   const firstName = appUserProfile.name.split(' ')[0];
 
-  const [messages, setMessages] = useState<MuseMessage[]>([
+  const [messages, setMessages] = useState<MuseMessage[]>(() => [
     { id: nextId(), role: 'muse', text: museGreeting(appUser, firstName) },
   ]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const [showChips, setShowChips] = useState(true);
+  const [followUps, setFollowUps] = useState<MuseFlow[]>([]);
   const [cart, setCart] = useState<MuseProduct | null>(null);
   const [purchased, setPurchased] = useState(false);
 
@@ -56,24 +59,42 @@ export function MuseScreen() {
     setTyping(true);
     const t = setTimeout(() => {
       setTyping(false);
-      setMessages((m) => [
-        ...m,
-        {
-          id: nextId(),
-          role: 'muse',
-          text: flow.answer,
-          productIds: flow.productIds,
-          faqId: flow.faqId,
-        },
-      ]);
+      const reply: MuseMessage = {
+        id: nextId(),
+        role: 'muse',
+        text: flow.answer,
+        productIds: flow.productIds,
+        faqId: flow.faqId,
+        followUp: flow.followUp,
+      };
+      setMessages((m) => [...m, reply]);
+      setFollowUps(
+        (flow.followUpIds ?? [])
+          .map((id) => museFlowById(id))
+          .filter((f): f is MuseFlow => Boolean(f)),
+      );
     }, 650);
     timers.current.push(t);
   };
 
   const send = (flow: MuseFlow, label?: string) => {
     setShowChips(false);
-    setMessages((m) => [...m, { id: nextId(), role: 'user', text: label ?? flow.prompt }]);
+    setFollowUps([]);
+    const userMsg: MuseMessage = { id: nextId(), role: 'user', text: label ?? flow.prompt };
+    setMessages((m) => [...m, userMsg]);
     pushMuse(flow);
+  };
+
+  const resetChat = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setMessages([{ id: nextId(), role: 'muse', text: museGreeting(appUser, firstName) }]);
+    setInput('');
+    setTyping(false);
+    setShowChips(true);
+    setFollowUps([]);
+    setCart(null);
+    setPurchased(false);
   };
 
   const handleFreeText = () => {
@@ -81,7 +102,9 @@ export function MuseScreen() {
     if (!text) return;
     setInput('');
     setShowChips(false);
-    setMessages((m) => [...m, { id: nextId(), role: 'user', text }]);
+    setFollowUps([]);
+    const userMsg: MuseMessage = { id: nextId(), role: 'user', text };
+    setMessages((m) => [...m, userMsg]);
     const flow = matchMuseFlow(text);
     if (flow) {
       pushMuse(flow);
@@ -89,14 +112,12 @@ export function MuseScreen() {
       setTyping(true);
       const t = setTimeout(() => {
         setTyping(false);
-        setMessages((m) => [
-          ...m,
-          {
-            id: nextId(),
-            role: 'muse',
-            text: "I can help you shop with cashback or answer a question about your card. Try one of these to get started:",
-          },
-        ]);
+        const reply: MuseMessage = {
+          id: nextId(),
+          role: 'muse',
+          text: "I can help you shop with cashback or answer a question about your card. Try one of these to get started:",
+        };
+        setMessages((m) => [...m, reply]);
         setShowChips(true);
       }, 650);
       timers.current.push(t);
@@ -118,20 +139,33 @@ export function MuseScreen() {
     <Screen chapterId={7}>
       <div className="flex h-full flex-col gap-3 pt-2">
         {/* Assistant identity header */}
-        <div className="flex items-center gap-3 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-3 shadow-card">
-          <span className="relative flex h-11 w-11 items-center justify-center rounded-full brand-gradient text-white">
-            <Icon name="auto_awesome" filled className="text-xl" />
+        <div className="flex items-center gap-2.5 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-3 shadow-card">
+          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full brand-gradient text-white">
+            <Icon name="auto_awesome" filled className="text-lg" />
             <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-success" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="font-heading text-base font-bold text-on-surface">Shopping Muse</p>
-            <p className="text-[11px] text-on-surface-variant">
-              SMCC assistant · shop with cashback & get answers
+            <p className="truncate font-heading text-base font-bold text-on-surface">Shopping Muse</p>
+            <p className="truncate text-[11px] text-on-surface-variant">
+              Shop with cashback · get answers
             </p>
           </div>
-          <span className="rounded-full bg-secondary-fixed px-2.5 py-1 text-[10px] font-bold text-secondary">
-            AI
-          </span>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {messages.length > 1 && (
+              <button
+                type="button"
+                onClick={resetChat}
+                aria-label="Back to Muse start"
+                title="Back to start"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-container-high bg-surface-container-low text-on-surface-variant transition-colors hover:text-primary active:scale-90"
+              >
+                <Icon name="arrow_back" className="text-lg" />
+              </button>
+            )}
+            <span className="rounded-full bg-secondary-fixed px-2.5 py-1 text-[10px] font-bold text-secondary">
+              AI
+            </span>
+          </div>
         </div>
 
         {/* Conversation */}
@@ -170,6 +204,44 @@ export function MuseScreen() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {suggested.map((flow) => (
+                    <button
+                      key={flow.id}
+                      type="button"
+                      onClick={() => send(flow)}
+                      className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-surface-container-lowest px-3 py-2 text-left text-xs font-semibold text-primary shadow-sm transition-colors hover:bg-primary/[0.04] active:scale-95"
+                    >
+                      <Icon
+                        name={
+                          flow.category === 'shop'
+                            ? 'shopping_bag'
+                            : flow.category === 'cashback'
+                              ? 'savings'
+                              : 'help'
+                        }
+                        className="text-sm"
+                      />
+                      {flow.prompt}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Follow-up prompt chips offered after a Muse reply */}
+          <AnimatePresence>
+            {followUps.length > 0 && !typing && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col gap-2"
+              >
+                <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-muted">
+                  You might also ask
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {followUps.map((flow) => (
                     <button
                       key={flow.id}
                       type="button"
@@ -364,6 +436,13 @@ function MessageBubble({ msg, onBuy }: { msg: MuseMessage; onBuy: (p: MuseProduc
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Follow-up question from Muse */}
+      {msg.followUp && (
+        <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-surface-container-low px-4 py-3 text-sm leading-relaxed text-on-surface">
+          {msg.followUp}
         </div>
       )}
     </motion.div>

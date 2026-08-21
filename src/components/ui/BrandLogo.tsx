@@ -1,13 +1,13 @@
 import { cn } from '@/hooks/utils';
 
 /**
- * SMCC (Vpass) wordmark logo. Uses the SMCC brand asset from /public with a
- * graceful text fallback if the image is unavailable.
+ * SMBC (SMCC) brand logo. Uses the official SMBC brand asset from /public with
+ * a graceful fallback if the image is unavailable.
  */
-export function BrandLogo({ className, alt = 'Vpass by SMCC' }: { className?: string; alt?: string }) {
+export function BrandLogo({ className, alt = 'SMBC' }: { className?: string; alt?: string }) {
   return (
     <img
-      src="/smcc-logo.svg"
+      src="/logo_smbc_01.jpg"
       alt={alt}
       className={cn('block w-auto max-w-none object-contain', className)}
       onError={(e) => {
