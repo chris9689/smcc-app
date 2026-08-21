@@ -134,11 +134,13 @@ export function StatusScreen() {
                   {/* Logo row */}
                   {offer.logo && (
                     <div className="mb-2 flex items-center gap-2">
-                      <img
-                        src={offer.logo}
-                        alt={offer.merchant}
-                        className="h-6 w-auto rounded object-contain"
-                      />
+                      <span className="inline-flex items-center rounded-md bg-white/95 px-1.5 py-1 shadow-sm">
+                        <img
+                          src={offer.logo}
+                          alt={offer.merchant}
+                          className="h-5 w-auto object-contain"
+                        />
+                      </span>
                     </div>
                   )}
 

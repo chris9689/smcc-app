@@ -1,0 +1,8 @@
+<svg width="206" height="58" viewBox="0 0 206 58" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SMBC">
+  <!-- SMBC group mark: three ascending parallelograms -->
+  <path d="M19 12 L31 12 L20 48 L8 48 Z" fill="#A6CE39"/>
+  <path d="M34 12 L46 12 L35 48 L23 48 Z" fill="#5FA733"/>
+  <path d="M49 12 L61 12 L50 48 L38 48 Z" fill="#2B7D3B"/>
+  <!-- SMBC wordmark -->
+  <text x="76" y="45" font-family="Georgia,'Times New Roman',serif" font-size="42" font-weight="500" letter-spacing="0.5" fill="#123f34">SMBC</text>
+</svg>

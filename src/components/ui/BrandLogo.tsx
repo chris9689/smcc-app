@@ -7,7 +7,7 @@ import { cn } from '@/hooks/utils';
 export function BrandLogo({ className, alt = 'SMBC' }: { className?: string; alt?: string }) {
   return (
     <img
-      src="/logo_smbc_01.jpg"
+      src="/smbc-logo.svg"
       alt={alt}
       className={cn('block w-auto max-w-none object-contain', className)}
       onError={(e) => {
