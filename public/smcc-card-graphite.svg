@@ -11,7 +11,7 @@
     </linearGradient>
   </defs>
   <rect width="1347" height="851" rx="56" fill="url(#bg)"/>
-  <circle cx="1120" cy="140" r="360" fill="#00A94F" opacity="0.10"/>
+  <circle cx="1120" cy="140" r="360" fill="#00A98C" opacity="0.10"/>
   <circle cx="240" cy="760" r="300" fill="#ffffff" opacity="0.04"/>
   <text x="80" y="150" font-family="'Plus Jakarta Sans',sans-serif" font-size="82" font-weight="800" fill="#ffffff" letter-spacing="-1">Vpass</text>
   <text x="1090" y="130" font-family="'Plus Jakarta Sans',sans-serif" font-size="46" font-weight="800" fill="#4BE08A" letter-spacing="1">SMCC</text>

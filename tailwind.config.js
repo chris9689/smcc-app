@@ -19,12 +19,12 @@ export default {
         'inverse-on-surface': '#eaf3ec',
         outline: '#6f8078',
         'outline-variant': '#c3d5c9',
-        primary: '#00873c',
+        primary: '#00846D',
         'on-primary': '#ffffff',
-        'primary-container': '#00a94f',
+        'primary-container': '#00a98c',
         'on-primary-container': '#ffffff',
-        'primary-fixed': '#c6f1d3',
-        'primary-fixed-dim': '#8fe3ab',
+        'primary-fixed': '#bfeee4',
+        'primary-fixed-dim': '#7fd9c8',
         secondary: '#0e8c86',
         'on-secondary': '#ffffff',
         'secondary-container': '#14b8a6',
@@ -40,11 +40,11 @@ export default {
 
         // Legacy aliases remapped so existing components adopt the SMCC palette
         rakuten: {
-          red: '#00a94f',
-          dark: '#00713a',
+          red: '#00846D',
+          dark: '#006152',
         },
         mc: {
-          red: '#00a94f',
+          red: '#00846D',
           orange: '#14b8a6',
         },
         ink: '#14211a',

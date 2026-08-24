@@ -50,11 +50,11 @@ body {
 
 /* Deep brand gradient used for the points balance hero (with shimmer). */
 .brand-gradient {
-  background: linear-gradient(135deg, #00632c 0%, #00873c 55%, #14b8a6 100%);
+  background: linear-gradient(135deg, #005a4a 0%, #00846D 55%, #14b8a6 100%);
 }
 
 .brand-gradient-soft {
-  background: linear-gradient(160deg, rgba(0, 135, 60, 0.07) 0%, rgba(20, 184, 166, 0.07) 100%);
+  background: linear-gradient(160deg, rgba(0, 132, 109, 0.07) 0%, rgba(20, 184, 166, 0.07) 100%);
 }
 
 /* Loyalty status gradient (fresh teal-green). */
@@ -64,14 +64,14 @@ body {
 
 /* Animated shimmer for the points balance card. */
 .points-card-shimmer {
-  background: linear-gradient(110deg, #00632c 8%, #00873c 18%, #00632c 33%);
+  background: linear-gradient(110deg, #005a4a 8%, #00846D 18%, #005a4a 33%);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
 
 /* Static deep-green balance card (no shimmer). */
 .points-card {
-  background: linear-gradient(135deg, #00632c 0%, #00a94f 100%);
+  background: linear-gradient(135deg, #005a4a 0%, #00a98c 100%);
 }
 
 .glass {
@@ -104,7 +104,7 @@ body {
 
 /* Focus visibility for keyboard users. */
 :focus-visible {
-  outline: 2px solid #00873c;
+  outline: 2px solid #00846D;
   outline-offset: 2px;
   border-radius: 6px;
 }

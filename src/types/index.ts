@@ -237,6 +237,10 @@ export interface AppUserOffer {
   image: string;
   /** Optional partner logo path served from /public. */
   logo?: string;
+  /** When true, the top-left source/network pill is hidden. */
+  hideSource?: boolean;
+  /** Optional chapter the CTA navigates to (defaults to the Offer screen). */
+  ctaChapter?: number;
 }
 
 /**
@@ -350,4 +354,6 @@ export interface GridOffer {
   logo?: string;
   /** Material Symbols icon name shown when no image is provided. */
   icon?: string;
+  /** Optional CTA label (defaults to "View offers"). */
+  cta?: string;
 }

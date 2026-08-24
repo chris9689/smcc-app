@@ -110,11 +110,13 @@ export function StatusScreen() {
               />
 
               {/* Top-left: offer source badge */}
-              <div className="absolute left-3 top-3 z-20">
-                <span className="rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-ink backdrop-blur-sm">
-                  {offer.source}
-                </span>
-              </div>
+              {!offer.hideSource && (
+                <div className="absolute left-3 top-3 z-20">
+                  <span className="rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold text-ink backdrop-blur-sm">
+                    {offer.source}
+                  </span>
+                </div>
+              )}
 
               {/* Top-right: offer type pill */}
               <div className="absolute right-3 top-3 z-20">
@@ -149,7 +151,7 @@ export function StatusScreen() {
                   <div className="mt-3 flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={(e) => { e.stopPropagation(); goToChapter(3); }}
+                      onClick={(e) => { e.stopPropagation(); goToChapter(offer.ctaChapter ?? 3); }}
                       className="relative z-30 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-ink"
                     >
                       {offer.cta}
@@ -170,10 +172,10 @@ export function StatusScreen() {
             {gridOffers.map((grid, i) => (
               <div
                 key={`${grid.merchant}-${grid.title}-${i}`}
-                className="flex aspect-square flex-col justify-between overflow-hidden rounded-2xl border border-surface-container-high bg-surface-container-lowest shadow-card"
+                className="flex flex-col overflow-hidden rounded-2xl border border-surface-container-high bg-surface-container-lowest shadow-card"
               >
                 {/* Media / icon header */}
-                <div className="relative flex h-20 items-center justify-center bg-surface-container-low">
+                <div className="relative flex h-20 shrink-0 items-center justify-center bg-surface-container-low">
                   {grid.image ? (
                     <img
                       src={grid.image}
@@ -191,7 +193,7 @@ export function StatusScreen() {
                 {/* Copy */}
                 <div className="flex flex-1 flex-col justify-between p-3">
                   <div>
-                    <p className="font-heading text-sm font-bold leading-tight text-on-surface">
+                    <p className="line-clamp-2 min-h-[2.4rem] font-heading text-sm font-bold leading-tight text-on-surface">
                       {grid.title}
                     </p>
                     {grid.logo ? (
@@ -207,7 +209,7 @@ export function StatusScreen() {
                     )}
                   </div>
                   <span className="mt-2 flex items-center gap-1 text-primary">
-                    <span className="text-[11px] font-semibold">View offers</span>
+                    <span className="text-[11px] font-semibold">{grid.cta ?? 'View offers'}</span>
                     <Icon name="chevron_right" className="text-sm" />
                   </span>
                 </div>
