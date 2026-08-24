@@ -3,9 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useDemo } from '@/app/DemoContext';
 import { Screen } from './Screen';
 import { Icon } from '@/components/ui/Icon';
-import { Button } from '@/components/ui/Button';
-import { Modal } from '@/components/ui/Modal';
 import { Disclaimer } from '@/components/ui/Card';
+import { CheckoutModal } from '@/components/shopping/CheckoutModal';
 import { formatYen } from '@/hooks/utils';
 import {
   museFaqById,
@@ -43,7 +42,6 @@ export function MuseScreen() {
   const [showChips, setShowChips] = useState(true);
   const [followUps, setFollowUps] = useState<MuseFlow[]>([]);
   const [cart, setCart] = useState<MuseProduct | null>(null);
-  const [purchased, setPurchased] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -93,7 +91,6 @@ export function MuseScreen() {
     setShowChips(true);
     setFollowUps([]);
     setCart(null);
-    setPurchased(false);
   };
 
   const handleFreeText = () => {
@@ -128,11 +125,8 @@ export function MuseScreen() {
     .filter((f): f is MuseFlow => Boolean(f));
 
   const openCheckout = (p: MuseProduct) => {
-    setPurchased(false);
     setCart(p);
   };
-
-  const cashbackYen = cart ? Math.round((cart.price * cart.cashbackPct) / 100) : 0;
 
   return (
     <Screen chapterId={7}>
@@ -292,79 +286,7 @@ export function MuseScreen() {
       </div>
 
       {/* Checkout / transaction modal */}
-      <Modal open={Boolean(cart)} onClose={() => setCart(null)} title={purchased ? undefined : 'Checkout'}>
-        {cart && !purchased && (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 rounded-2xl bg-surface-container-low p-3">
-              <span className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl brand-gradient-soft text-3xl">
-                {cart.emoji}
-                {cart.image && (
-                  <img
-                    src={cart.image}
-                    alt={cart.name}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                )}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-heading text-sm font-bold text-ink">{cart.name}</p>
-                <p className="text-[11px] text-muted">{cart.brand}</p>
-              </div>
-              <p className="font-heading text-sm font-bold text-ink">{formatYen(cart.price)}</p>
-            </div>
-
-            <div className="flex items-center justify-between rounded-2xl border border-primary/25 bg-primary/[0.05] px-3 py-2.5">
-              <span className="flex items-center gap-2 text-xs font-bold text-primary">
-                <Icon name="savings" filled className="text-base" />
-                Cashback ({cart.cashbackPct}%)
-              </span>
-              <span className="font-heading text-sm font-extrabold text-primary">
-                +{formatYen(cashbackYen)}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2 text-[11px] text-muted">
-              <Icon name="credit_card" className="text-base text-on-surface-variant" />
-              Paying with your SMCC card ·••• 4820
-            </div>
-
-            <Button fullWidth size="lg" onClick={() => setPurchased(true)}>
-              Pay {formatYen(cart.price)}
-            </Button>
-            <button
-              type="button"
-              onClick={() => setCart(null)}
-              className="text-center text-xs font-bold text-on-surface-variant"
-            >
-              Keep browsing
-            </button>
-          </div>
-        )}
-
-        {cart && purchased && (
-          <div className="flex flex-col items-center gap-3 text-center">
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-success text-white"
-            >
-              <Icon name="check" filled className="text-3xl" />
-            </motion.span>
-            <h3 className="font-heading text-lg font-extrabold text-ink">Purchase complete</h3>
-            <p className="text-sm text-muted">
-              {cart.name} is on its way. <span className="font-bold text-primary">{formatYen(cashbackYen)} cashback</span> will
-              be credited to your SMCC card.
-            </p>
-            <Button fullWidth size="md" className="mt-1" onClick={() => setCart(null)}>
-              Back to Muse
-            </Button>
-          </div>
-        )}
-      </Modal>
+      <CheckoutModal product={cart} onClose={() => setCart(null)} />
     </Screen>
   );
 }

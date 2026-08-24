@@ -14,7 +14,7 @@ const tabs: Tab[] = [
   { label: 'Home', icon: 'home', chapter: 1, range: [1] },
   { label: 'Shop', icon: 'shopping_bag', chapter: 2, range: [2, 3] },
   { label: 'Muse', icon: 'auto_awesome', chapter: 7, range: [7] },
-  { label: 'Benefits', icon: 'card_giftcard', chapter: 6, range: [6] },
+  { label: 'Cashback', icon: 'savings', chapter: 6, range: [6] },
   { label: 'Points', icon: 'account_balance_wallet', chapter: 4, range: [4, 5] },
 ];
 

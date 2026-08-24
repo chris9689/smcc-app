@@ -16,8 +16,8 @@ export const chapters: Chapter[] = [
   {
     id: 2,
     key: 'browse',
-    title: 'Browse',
-    copy: 'Electronics for your home.',
+    title: 'Shop',
+    copy: 'Marketplace — shop and earn cashback.',
     icon: '🛒',
   },
   {
@@ -44,9 +44,9 @@ export const chapters: Chapter[] = [
   {
     id: 6,
     key: 'saved',
-    title: 'Saved',
-    copy: 'Your saved benefits and offers.',
-    icon: '🔖',
+    title: 'Cashback',
+    copy: 'Your cashback and benefits.',
+    icon: '💰',
   },
   {
     id: 7,

@@ -274,7 +274,7 @@ export function StatusScreen() {
             </span>
             <div>
               <p className="font-heading text-xl font-bold text-on-surface">3</p>
-              <p className="text-[11px] text-on-surface-variant">active benefits available</p>
+              <p className="text-[11px] text-on-surface-variant">cashback offers active</p>
             </div>
             <span className="flex items-center gap-1 text-primary">
               <span className="text-[11px] font-semibold">View all</span>

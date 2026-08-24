@@ -26,6 +26,8 @@ export interface MuseProduct {
   emoji: string;
   /** Optional product photo path served from /public. Falls back to the emoji tile. */
   image?: string;
+  /** Marketplace category, e.g. 'Fashion' | 'Tech' | 'Travel' | 'Everyday' | 'Luxury' | 'Experience'. */
+  category?: string;
   /** Optional highlight tag, e.g. "Trending". */
   tag?: string;
   /** Short one-line descriptor. */
@@ -60,24 +62,41 @@ export interface MuseFlow {
 }
 
 export const museProducts: MuseProduct[] = [
-  { id: 'm-blazer', name: 'Lightweight linen blazer', brand: 'UNIQLO', price: 12900, cashbackPct: 6, emoji: '🧥', image: '/muse/blazer.webp', tag: 'Editor’s pick', blurb: 'Breathable smart-casual layer for humid evenings.' },
-  { id: 'm-polo', name: 'Quick-dry polo shirt', brand: 'UNIQLO', price: 4200, cashbackPct: 6, emoji: '👕', image: '/muse/polo.jpg', blurb: 'Stays fresh through a full day out.' },
-  { id: 'm-sneakers', name: 'Breathable travel sneakers', brand: 'ONE', price: 9800, cashbackPct: 8, emoji: '👟', image: '/muse/sneaker.jpg', tag: 'Trending', blurb: 'Cushioned for long days of walking.' },
-  { id: 'm-sunglasses', name: 'Polarised sunglasses', brand: 'ZOFF', price: 6500, cashbackPct: 5, emoji: '🕶️', image: '/muse/sunglasses.webp', blurb: 'UV400 protection for bright, sunny days.' },
-  { id: 'm-carryon', name: 'Compact 40L carry-on', brand: 'MUJI', price: 18900, cashbackPct: 10, emoji: '🧳', image: '/muse/carryon.webp', tag: 'Trip-ready', blurb: 'Cabin-sized, fits most airline limits.' },
-  { id: 'm-adapter', name: 'Universal travel adapter', brand: 'ELECOM', price: 2300, cashbackPct: 12, emoji: '🔌', image: '/muse/adapter.jpeg', tag: 'Best cashback', blurb: 'Works in Singapore (Type G) and 150+ countries.' },
-  { id: 'm-powerbank', name: 'Slim 10,000mAh power bank', brand: 'Anker', price: 3900, cashbackPct: 9, emoji: '🔋', image: '/muse/powerbank.png', blurb: 'Keeps your phone charged on the go.' },
-  { id: 'm-earbuds', name: 'Noise-cancelling earbuds', brand: 'SONY', price: 15400, cashbackPct: 7, emoji: '🎧', image: '/muse/earbuds.webp', blurb: 'Quiet the cabin on your flight.' },
+  { id: 'm-blazer', name: 'Lightweight linen blazer', brand: 'UNIQLO', price: 12900, cashbackPct: 6, emoji: '🧥', image: '/muse/blazer.webp', category: 'Fashion', tag: 'Editor’s pick', blurb: 'Breathable smart-casual layer for humid evenings.' },
+  { id: 'm-polo', name: 'Quick-dry polo shirt', brand: 'UNIQLO', price: 4200, cashbackPct: 6, emoji: '👕', image: '/muse/polo.jpg', category: 'Fashion', blurb: 'Stays fresh through a full day out.' },
+  { id: 'm-sneakers', name: 'Breathable travel sneakers', brand: 'ONE', price: 9800, cashbackPct: 8, emoji: '👟', image: '/muse/sneaker.jpg', category: 'Fashion', tag: 'Trending', blurb: 'Cushioned for long days of walking.' },
+  { id: 'm-sunglasses', name: 'Polarised sunglasses', brand: 'ZOFF', price: 6500, cashbackPct: 5, emoji: '🕶️', image: '/muse/sunglasses.webp', category: 'Fashion', blurb: 'UV400 protection for bright, sunny days.' },
+  { id: 'm-carryon', name: 'Compact 40L carry-on', brand: 'MUJI', price: 18900, cashbackPct: 10, emoji: '🧳', image: '/muse/carryon.webp', category: 'Travel', tag: 'Trip-ready', blurb: 'Cabin-sized, fits most airline limits.' },
+  { id: 'm-adapter', name: 'Universal travel adapter', brand: 'ELECOM', price: 2300, cashbackPct: 12, emoji: '🔌', image: '/muse/adapter.jpeg', category: 'Travel', tag: 'Best cashback', blurb: 'Works in Singapore (Type G) and 150+ countries.' },
+  { id: 'm-powerbank', name: 'Slim 10,000mAh power bank', brand: 'Anker', price: 3900, cashbackPct: 9, emoji: '🔋', image: '/muse/powerbank.png', category: 'Tech', blurb: 'Keeps your phone charged on the go.' },
+  { id: 'm-earbuds', name: 'Noise-cancelling earbuds', brand: 'SONY', price: 15400, cashbackPct: 7, emoji: '🎧', image: '/muse/earbuds.webp', category: 'Tech', blurb: 'Quiet the cabin on your flight.' },
   // New-member / everyday essentials (welcome persona)
-  { id: 'm-mug', name: 'Insulated travel mug', brand: 'Zojirushi', price: 3200, cashbackPct: 10, emoji: '☕', image: '/muse/mug.webp', tag: 'New-member pick', blurb: 'Keeps coffee hot for hours — great first buy.' },
-  { id: 'm-tote', name: 'Everyday canvas tote', brand: 'MUJI', price: 2900, cashbackPct: 8, emoji: '👜', image: '/muse/tote.jpg', blurb: 'Roomy carry-all for daily errands.' },
-  { id: 'm-notebook', name: 'Everyday notebook set', brand: 'Kokuyo', price: 1200, cashbackPct: 6, emoji: '📓', image: '/muse/notebook.webp', blurb: 'Simple, sturdy daily notebooks.' },
+  { id: 'm-mug', name: 'Insulated travel mug', brand: 'Zojirushi', price: 3200, cashbackPct: 10, emoji: '☕', image: '/muse/mug.webp', category: 'Everyday', tag: 'New-member pick', blurb: 'Keeps coffee hot for hours — great first buy.' },
+  { id: 'm-tote', name: 'Everyday canvas tote', brand: 'MUJI', price: 2900, cashbackPct: 8, emoji: '👜', image: '/muse/tote.jpg', category: 'Everyday', blurb: 'Roomy carry-all for daily errands.' },
+  { id: 'm-notebook', name: 'Everyday notebook set', brand: 'Kokuyo', price: 1200, cashbackPct: 6, emoji: '📓', image: '/muse/notebook.webp', category: 'Everyday', blurb: 'Simple, sturdy daily notebooks.' },
   // Singapore luxury retail & experiences (traveller persona)
-  { id: 'm-perfume', name: 'Designer fragrance', brand: 'Orchard Road', price: 18500, cashbackPct: 8, emoji: '🧴', image: '/muse/perfume.webp', tag: 'Luxury', blurb: 'A duty-friendly luxury pick on Orchard Road.' },
-  { id: 'm-watch', name: 'Minimalist travel watch', brand: 'ION Orchard', price: 42000, cashbackPct: 6, emoji: '⌚', image: '/muse/watch.webp', tag: 'Luxury', blurb: 'A refined souvenir from Singapore retail.' },
-  { id: 'm-gardens', name: 'Gardens by the Bay entry', brand: 'Klook', price: 5300, cashbackPct: 10, emoji: '🌳', image: '/muse/gardens-by-the-bay.jpg', tag: 'Experience', blurb: 'Skip-the-line entry to the iconic domes.' },
-  { id: 'm-nightsafari', name: 'Night Safari experience', brand: 'Klook', price: 6600, cashbackPct: 10, emoji: '🦁', image: '/muse/night-safari.jpg', tag: 'Experience', blurb: 'Evening wildlife adventure near the city.' },
+  { id: 'm-perfume', name: 'Designer fragrance', brand: 'Orchard Road', price: 18500, cashbackPct: 8, emoji: '🧴', image: '/muse/perfume.webp', category: 'Luxury', tag: 'Luxury', blurb: 'A duty-friendly luxury pick on Orchard Road.' },
+  { id: 'm-watch', name: 'Minimalist travel watch', brand: 'ION Orchard', price: 42000, cashbackPct: 6, emoji: '⌚', image: '/muse/watch.webp', category: 'Luxury', tag: 'Luxury', blurb: 'A refined souvenir from Singapore retail.' },
+  { id: 'm-gardens', name: 'Gardens by the Bay entry', brand: 'Klook', price: 5300, cashbackPct: 10, emoji: '🌳', image: '/muse/gardens-by-the-bay.jpg', category: 'Experience', tag: 'Experience', blurb: 'Skip-the-line entry to the iconic domes.' },
+  { id: 'm-nightsafari', name: 'Night Safari experience', brand: 'Klook', price: 6600, cashbackPct: 10, emoji: '🦁', image: '/muse/night-safari.jpg', category: 'Experience', tag: 'Experience', blurb: 'Evening wildlife adventure near the city.' },
 ];
+
+/** Illustrative V Points earned on a purchase (1 point per ¥100 spent). */
+export const vPointsFor = (price: number): number => Math.round(price / 100);
+
+/** Marketplace filter categories (products only — experiences excluded). */
+export const marketplaceCategories = ['All', 'Fashion', 'Tech', 'Travel', 'Everyday', 'Luxury'];
+
+/** Shoppable marketplace products (excludes experience bookings). */
+export const marketplaceProducts: MuseProduct[] = museProducts.filter(
+  (p) => p.category && p.category !== 'Experience',
+);
+
+/** Persona-aware "Recommended for you" product ids for the marketplace. */
+export const recommendedProductIdsByUser: Record<AppUserId, string[]> = {
+  1: ['m-mug', 'm-tote', 'm-notebook', 'm-sunglasses'],
+  2: ['m-carryon', 'm-adapter', 'm-earbuds', 'm-perfume', 'm-watch'],
+};
 
 export const museProductById = (id: string): MuseProduct | undefined =>
   museProducts.find((p) => p.id === id);
