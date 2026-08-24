@@ -182,8 +182,13 @@ export interface Chapter {
   icon: string;
 }
 
-/** Selectable app-user id driving the home experience variant (1-4). */
-export type AppUserId = 1 | 2 | 3 | 4;
+/**
+ * Selectable app-user id driving the home experience variant.
+ * The demo has two personas:
+ *  - 1 — New Cardholder (welcome phase, support/FAQ-led)
+ *  - 2 — Singapore Traveller (travel-intent driven)
+ */
+export type AppUserId = 1 | 2;
 
 /**
  * Source/network an offer originates from. SMCC brings together offers from
@@ -248,10 +253,52 @@ export interface AlternativeOffer {
   cta: string;
 }
 
-/** Full home-experience definition for one of the four app users. */
+/**
+ * Presenter-facing narrative for a persona. Surfaced in Presenter mode so the
+ * presenter can quickly explain the customer context, why recommendations
+ * change, and how personalisation is working — in business-friendly language.
+ */
+export interface PresenterPersona {
+  /** Persona role label, e.g. "New Cardholder". */
+  role: string;
+  /** One-line description of who this customer is. */
+  headline: string;
+  /** Key behavioural / contextual signals driving personalisation. */
+  signals: string[];
+  /** Why the experience is personalised the way it is. */
+  rationale: string;
+  /** What the presenter should aim to demonstrate with this persona. */
+  objectives: string[];
+  /** Key offers surfaced for this persona. */
+  keyOffers: string[];
+  /** Key Shopping Muse prompts to try for this persona. */
+  musePrompts: string[];
+  /** Business-friendly "Why shown now" summary. */
+  whyNow: string;
+}
+
+/**
+ * A persona-specific V Points nudge shown on the home screen in place of the
+ * loyalty status card. For a new member it drives status/earn behaviour; for
+ * an established member it can cross-sell a financial product with points.
+ */
+export interface PointsNudge {
+  /** Material Symbols icon name. */
+  icon: string;
+  /** Small eyebrow label above the title. */
+  eyebrow: string;
+  /** Nudge headline. */
+  title: string;
+  /** Supporting body copy. */
+  body: string;
+  /** Call-to-action button label. */
+  cta: string;
+}
+
+/** Full home-experience definition for one of the app users. */
 export interface AppUserProfile {
   id: AppUserId;
-  /** Persona display name, e.g. "Hanako Tanaka". */
+  /** Persona display name, e.g. "Aoi Suzuki". */
   name: string;
   /** One-line situational context for the persona (time / activity). */
   context: string;
@@ -280,6 +327,10 @@ export interface AppUserProfile {
   why: WhyReason[];
   /** Alternative / supporting offers considered, shown in the panel. */
   alternatives?: AlternativeOffer[];
+  /** Persona-specific V Points nudge shown on the home screen. */
+  pointsNudge: PointsNudge;
+  /** Presenter-mode narrative for this persona. */
+  presenter: PresenterPersona;
 }
 
 /**

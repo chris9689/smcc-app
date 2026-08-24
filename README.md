@@ -48,12 +48,17 @@ npm run build
 
 ## Personas
 
-Switch personas from the hidden presenter panel (press `P` → App user):
+Switch personas from the hidden presenter panel (press `P` → Persona):
 
-1. Hanako — furnishing a new home.
-2. Kumiko — planning an Okinawa trip.
-3. Kenji — **Singapore trip** triggered by a Marina Bay hotel booking.
-4. Yuki — lunchtime dining cashback.
+1. **New Cardholder** (Aoi) — recently onboarded and in the welcome period.
+   Welcome / first-purchase cashback is prioritised, and Shopping Muse leads
+   with FAQ and card-support answers alongside beginner-friendly offers.
+2. **Singapore Traveller** (Kenji) — a Marina Bay hotel booking marks a
+   **Singapore trip**, so the app prioritises Singapore travel, dining, and
+   cashback content, and Muse acts as a travel-commerce marketplace.
+
+Each persona has a full Presenter-mode story (signals, rationale, demo
+objectives, key offers, key Muse prompts, and a "Why shown now" summary).
 
 ## Navigation model
 

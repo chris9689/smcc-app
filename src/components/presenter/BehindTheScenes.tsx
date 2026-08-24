@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useDemo } from '@/app/DemoContext';
 import { drawerVariants } from '@/animations/variants';
@@ -9,9 +8,32 @@ import { RankingBoard } from '@/components/decision-theatre/RankingBoard';
 import { Button } from '@/components/ui/Button';
 import { Disclaimer } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
-import { winningOffer } from '@/services/decisionEngine';
 import { settings } from '@/mock-data/settings';
-import { campaigns } from '@/mock-data/campaigns';
+
+/** Persona-aware insight + campaign framing for the Reasoning view. */
+const reasoningByUser: Record<
+  number,
+  { emoji: string; pattern: string; hypothesis: string; campaign: string; audience: string; dyId: string }
+> = {
+  1: {
+    emoji: '🎉',
+    pattern:
+      'activated their card 8 days ago with very little spend so far — clearly still in the welcome phase.',
+    hypothesis: 'Hypothesis: new cardholder — prioritise welcome, first-purchase and support.',
+    campaign: 'New Member Welcome Next-Best-Action',
+    audience: 'Recently onboarded, welcome period',
+    dyId: 'DY-EXP-10190',
+  },
+  2: {
+    emoji: '🧳',
+    pattern:
+      'booked a Marina Bay hotel and has a travel-related purchase on the card — a Singapore trip is coming up in about three weeks.',
+    hypothesis: 'Hypothesis: active travel intent for Singapore — prioritise travel, dining and cashback.',
+    campaign: 'Singapore Travel Next-Best-Action',
+    audience: 'Travel-intent, Singapore destination',
+    dyId: 'DY-EXP-10241',
+  },
+};
 
 /**
  * "Reasoning" decisioning view. This is the ONLY place
@@ -19,9 +41,11 @@ import { campaigns } from '@/mock-data/campaigns';
  * It never appears in the customer-facing app screens.
  */
 export function BehindTheScenes() {
-  const { behindOpen, setBehindOpen, replayDecision, replayToken, persona } = useDemo();
-  const winner = useMemo(() => winningOffer(persona), [persona]);
-  const activeCampaign = campaigns[0]; // Home Setup Next-Best-Action
+  const { behindOpen, setBehindOpen, replayDecision, replayToken, appUser, appUserProfile } =
+    useDemo();
+  const firstName = appUserProfile.name.split(' ')[0];
+  const insight = reasoningByUser[appUser] ?? reasoningByUser[1];
+  const winningTitle = appUserProfile.offers[0]?.title ?? 'Recommended offer';
 
   return (
     <AnimatePresence>
@@ -72,14 +96,14 @@ export function BehindTheScenes() {
                 </div>
                 <div className="rounded-2xl border border-black/10 bg-surface-container-low p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <span className="text-base" aria-hidden>📊</span>
+                    <span className="text-base" aria-hidden>{insight.emoji}</span>
                     <p className="text-xs font-bold text-ink">SMCC card · Spending Summary</p>
                   </div>
                   <p className="text-xs leading-relaxed text-muted">
-                    <span className="font-semibold text-ink">Pattern detected:</span> Hanako has spent ¥42,000 on home setup items over the past 60 days — kitchen appliances, lighting, furniture, curtains.
+                    <span className="font-semibold text-ink">Pattern detected:</span> {firstName} {insight.pattern}
                   </p>
                   <p className="mt-1.5 text-[11px] italic text-muted">
-                    Hypothesis: possible recent move or home renovation in progress.
+                    {insight.hypothesis}
                   </p>
                   <div className="mt-2 flex items-center gap-1 text-primary">
                     <Icon name="arrow_downward" className="text-sm" />
@@ -89,7 +113,7 @@ export function BehindTheScenes() {
               </section>
 
               <section>
-                <SectionTitle step="1" title="Understanding Hanako's moment" />
+                <SectionTitle step="1" title={`Understanding ${firstName}'s moment`} />
                 <p className="mb-3 text-xs text-muted">
                   Safe, approved signals only — no sensitive payment or PCI data.
                 </p>
@@ -112,8 +136,8 @@ export function BehindTheScenes() {
                 <div className="mt-3 flex items-start gap-2 rounded-2xl brand-gradient-soft p-3">
                   <span aria-hidden>💡</span>
                   <p className="text-[11px] leading-snug text-ink">
-                    <span className="font-bold">Winning action:</span> {winner.offer.title} —
-                    selected because Hanako's recent activity suggests a home setup moment.
+                    <span className="font-bold">Winning action:</span> {winningTitle} —
+                    selected because {firstName}'s current context makes it the most relevant next step.
                   </p>
                 </div>
 
@@ -125,11 +149,11 @@ export function BehindTheScenes() {
                       ● Live
                     </span>
                   </div>
-                  <p className="mt-1 font-heading text-sm font-bold text-ink">{activeCampaign.name}</p>
-                  <p className="mt-0.5 font-mono text-[11px] text-muted">{activeCampaign.dyExperienceId}</p>
+                  <p className="mt-1 font-heading text-sm font-bold text-ink">{insight.campaign}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-muted">{insight.dyId}</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold text-muted">{activeCampaign.channel}</span>
-                    <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold text-muted">{activeCampaign.audience}</span>
+                    <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold text-muted">App · Rewards Hub</span>
+                    <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-semibold text-muted">{insight.audience}</span>
                   </div>
                 </div>
 

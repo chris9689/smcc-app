@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useDemo } from '@/app/DemoContext';
 import { Screen } from './Screen';
-import { LoyaltyStatusCard } from '@/components/loyalty/LoyaltyStatusCard';
 import { CardFace } from '@/components/loyalty/CardFace';
 import { SearchBar } from '@/components/shopping/SearchBar';
 import { Icon } from '@/components/ui/Icon';
@@ -13,13 +12,11 @@ import { settings } from '@/mock-data/settings';
 export function StatusScreen() {
   const { user, goToChapter, appUser, appUserProfile, openWhy } = useDemo();
   const [query, setQuery] = useState('');
-  const { offers, gridOffers, gridTitle, spendingInsight } = appUserProfile;
+  const { offers, gridOffers, gridTitle, spendingInsight, pointsNudge } = appUserProfile;
 
   const museProactive: Record<number, string> = {
-    1: 'I spotted cashback on the home items you’ve been comparing — want me to line them up?',
-    2: 'Planning Okinawa? I can pull warm-weather styles with cashback in seconds.',
-    3: 'You’re heading to Singapore — I’ve lined up travel cashback and outfit ideas for the trip.',
-    4: 'It’s almost lunch — I found dining cashback near you. Want a quick look?',
+    1: 'You’re still in your welcome period — want to see the cashback offers you can activate now, or ask how your card works?',
+    2: 'You’re heading to Singapore — I’ve lined up travel cashback, things to do and dining picks for the trip.',
   };
 
   return (
@@ -39,7 +36,7 @@ export function StatusScreen() {
               See personalised benefits available for you.
             </p>
           </div>
-          <SearchBar value={query} onChange={setQuery} placeholder="Search SMCC Mall & offers" />
+          <SearchBar value={query} onChange={setQuery} placeholder="Search SMCC cashback & offers" />
         </section>
 
         {/* Proactive Shopping Muse nudge — context-aware engagement */}
@@ -210,7 +207,7 @@ export function StatusScreen() {
                     )}
                   </div>
                   <span className="mt-2 flex items-center gap-1 text-primary">
-                    <span className="text-[11px] font-semibold">View offer</span>
+                    <span className="text-[11px] font-semibold">View offers</span>
                     <Icon name="chevron_right" className="text-sm" />
                   </span>
                 </div>
@@ -219,8 +216,33 @@ export function StatusScreen() {
           </div>
         </section>
 
-        {/* Loyalty status card — moved below the offers */}
-        <LoyaltyStatusCard />
+        {/* V Points nudge — persona-specific (status earn vs. product cross-sell) */}
+        <section className="overflow-hidden rounded-2xl border border-secondary/25 bg-secondary-fixed/40 p-4 shadow-card">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl brand-gradient text-white">
+              <Icon name={pointsNudge.icon} filled className="text-xl" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-secondary">
+                {pointsNudge.eyebrow}
+              </p>
+              <p className="mt-0.5 font-heading text-sm font-bold text-on-surface">
+                {pointsNudge.title}
+              </p>
+              <p className="mt-1 text-[12px] leading-relaxed text-on-surface-variant">
+                {pointsNudge.body}
+              </p>
+              <button
+                type="button"
+                onClick={() => goToChapter(4)}
+                className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-primary px-3.5 py-1.5 text-xs font-bold text-white transition-transform active:scale-95"
+              >
+                {pointsNudge.cta}
+                <Icon name="arrow_forward" className="text-sm" />
+              </button>
+            </div>
+          </div>
+        </section>
 
         {/* Spending Insight card — moved below the offers, per-user copy */}
         <section className="rounded-2xl border border-surface-container-high bg-surface-container-lowest p-4 shadow-card">

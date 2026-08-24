@@ -22,8 +22,10 @@ export interface MuseProduct {
   price: number;
   /** Illustrative card-linked cashback rate (%). */
   cashbackPct: number;
-  /** Emoji used for the product tile (keeps the demo asset-light and clean). */
+  /** Emoji used for the product tile (fallback when no image is provided). */
   emoji: string;
+  /** Optional product photo path served from /public. Falls back to the emoji tile. */
+  image?: string;
   /** Optional highlight tag, e.g. "Trending". */
   tag?: string;
   /** Short one-line descriptor. */
@@ -58,14 +60,23 @@ export interface MuseFlow {
 }
 
 export const museProducts: MuseProduct[] = [
-  { id: 'm-blazer', name: 'Lightweight linen blazer', brand: 'UNIQLO', price: 12900, cashbackPct: 6, emoji: '🧥', tag: 'Editor’s pick', blurb: 'Breathable smart-casual layer for humid evenings.' },
-  { id: 'm-polo', name: 'Quick-dry polo shirt', brand: 'UNIQLO', price: 4200, cashbackPct: 6, emoji: '👕', blurb: 'Stays fresh through a full day out.' },
-  { id: 'm-sneakers', name: 'Breathable travel sneakers', brand: 'ONE', price: 9800, cashbackPct: 8, emoji: '👟', tag: 'Trending', blurb: 'Cushioned for long days of walking.' },
-  { id: 'm-sunglasses', name: 'Polarised sunglasses', brand: 'ZOFF', price: 6500, cashbackPct: 5, emoji: '🕶️', blurb: 'UV400 protection for bright, sunny days.' },
-  { id: 'm-carryon', name: 'Compact 40L carry-on', brand: 'MUJI', price: 18900, cashbackPct: 10, emoji: '🧳', tag: 'Trip-ready', blurb: 'Cabin-sized, fits most airline limits.' },
-  { id: 'm-adapter', name: 'Universal travel adapter', brand: 'ELECOM', price: 2300, cashbackPct: 12, emoji: '🔌', tag: 'Best cashback', blurb: 'Works in Singapore (Type G) and 150+ countries.' },
-  { id: 'm-powerbank', name: 'Slim 10,000mAh power bank', brand: 'Anker', price: 3900, cashbackPct: 9, emoji: '🔋', blurb: 'Keeps your phone charged on the go.' },
-  { id: 'm-earbuds', name: 'Noise-cancelling earbuds', brand: 'SONY', price: 15400, cashbackPct: 7, emoji: '🎧', blurb: 'Quiet the cabin on your flight.' },
+  { id: 'm-blazer', name: 'Lightweight linen blazer', brand: 'UNIQLO', price: 12900, cashbackPct: 6, emoji: '🧥', image: '/muse/blazer.webp', tag: 'Editor’s pick', blurb: 'Breathable smart-casual layer for humid evenings.' },
+  { id: 'm-polo', name: 'Quick-dry polo shirt', brand: 'UNIQLO', price: 4200, cashbackPct: 6, emoji: '👕', image: '/muse/polo.jpg', blurb: 'Stays fresh through a full day out.' },
+  { id: 'm-sneakers', name: 'Breathable travel sneakers', brand: 'ONE', price: 9800, cashbackPct: 8, emoji: '👟', image: '/muse/sneaker.jpg', tag: 'Trending', blurb: 'Cushioned for long days of walking.' },
+  { id: 'm-sunglasses', name: 'Polarised sunglasses', brand: 'ZOFF', price: 6500, cashbackPct: 5, emoji: '🕶️', image: '/muse/sunglasses.webp', blurb: 'UV400 protection for bright, sunny days.' },
+  { id: 'm-carryon', name: 'Compact 40L carry-on', brand: 'MUJI', price: 18900, cashbackPct: 10, emoji: '🧳', image: '/muse/carryon.webp', tag: 'Trip-ready', blurb: 'Cabin-sized, fits most airline limits.' },
+  { id: 'm-adapter', name: 'Universal travel adapter', brand: 'ELECOM', price: 2300, cashbackPct: 12, emoji: '🔌', image: '/muse/adapter.jpeg', tag: 'Best cashback', blurb: 'Works in Singapore (Type G) and 150+ countries.' },
+  { id: 'm-powerbank', name: 'Slim 10,000mAh power bank', brand: 'Anker', price: 3900, cashbackPct: 9, emoji: '🔋', image: '/muse/powerbank.png', blurb: 'Keeps your phone charged on the go.' },
+  { id: 'm-earbuds', name: 'Noise-cancelling earbuds', brand: 'SONY', price: 15400, cashbackPct: 7, emoji: '🎧', image: '/muse/earbuds.webp', blurb: 'Quiet the cabin on your flight.' },
+  // New-member / everyday essentials (welcome persona)
+  { id: 'm-mug', name: 'Insulated travel mug', brand: 'Zojirushi', price: 3200, cashbackPct: 10, emoji: '☕', image: '/muse/mug.webp', tag: 'New-member pick', blurb: 'Keeps coffee hot for hours — great first buy.' },
+  { id: 'm-tote', name: 'Everyday canvas tote', brand: 'MUJI', price: 2900, cashbackPct: 8, emoji: '👜', image: '/muse/tote.jpg', blurb: 'Roomy carry-all for daily errands.' },
+  { id: 'm-notebook', name: 'Everyday notebook set', brand: 'Kokuyo', price: 1200, cashbackPct: 6, emoji: '📓', image: '/muse/notebook.webp', blurb: 'Simple, sturdy daily notebooks.' },
+  // Singapore luxury retail & experiences (traveller persona)
+  { id: 'm-perfume', name: 'Designer fragrance', brand: 'Orchard Road', price: 18500, cashbackPct: 8, emoji: '🧴', image: '/muse/perfume.webp', tag: 'Luxury', blurb: 'A duty-friendly luxury pick on Orchard Road.' },
+  { id: 'm-watch', name: 'Minimalist travel watch', brand: 'ION Orchard', price: 42000, cashbackPct: 6, emoji: '⌚', image: '/muse/watch.webp', tag: 'Luxury', blurb: 'A refined souvenir from Singapore retail.' },
+  { id: 'm-gardens', name: 'Gardens by the Bay entry', brand: 'Klook', price: 5300, cashbackPct: 10, emoji: '🌳', image: '/muse/gardens-by-the-bay.jpg', tag: 'Experience', blurb: 'Skip-the-line entry to the iconic domes.' },
+  { id: 'm-nightsafari', name: 'Night Safari experience', brand: 'Klook', price: 6600, cashbackPct: 10, emoji: '🦁', image: '/muse/night-safari.jpg', tag: 'Experience', blurb: 'Evening wildlife adventure near the city.' },
 ];
 
 export const museProductById = (id: string): MuseProduct | undefined =>
@@ -102,12 +113,137 @@ export const museFaqs: MuseFaq[] = [
     answer:
       'Your monthly statement is available under Card → Statements. You can also set alerts so you always know when a new statement is ready.',
   },
+  {
+    id: 'faq-benefits',
+    question: 'What benefits come with my card?',
+    answer:
+      'Your SMCC card includes card-linked cashback offers, V Points on eligible spend, member perks and campaigns, plus travel and purchase protection. New members also get welcome offers during their first 90 days. See everything under Card → Benefits.',
+  },
+  {
+    id: 'faq-merchants',
+    question: 'Which merchants offer cashback?',
+    answer:
+      'Cashback is available across thousands of merchants and partners. In the app, any offer tagged “Cashback” is ready to activate — just look for the savings badge. New merchants are added regularly.',
+  },
+  {
+    id: 'faq-timing',
+    question: 'How long does cashback take to appear?',
+    answer:
+      'Once you pay with your SMCC card on an activated offer, cashback is confirmed after the transaction settles — usually within a few statement cycles. You can track pending and confirmed cashback under Card → Cashback. Subject to programme rules.',
+  },
 ];
 
 export const museFaqById = (id: string): MuseFaq | undefined =>
   museFaqs.find((f) => f.id === id);
 
 export const museFlows: MuseFlow[] = [
+  // ── New Cardholder · FAQ / support-led, with welcome commerce ──
+  {
+    id: 'flow-earn-cashback',
+    prompt: 'How do I earn cashback?',
+    category: 'cashback',
+    keywords: ['how do i earn', 'earn cashback', 'how cashback', 'start earning', 'get cashback'],
+    answer:
+      "Easy — activate any offer tagged “Cashback”, then pay with your SMCC card at that merchant. The cashback is worked out on your spend and credited automatically. As a new member you’ve also got a 5% first-purchase welcome offer ready to go.",
+    faqId: 'faq-cashback',
+    followUp: 'Want to see which merchants offer cashback, or how long it takes to appear?',
+    followUpIds: ['flow-merchants', 'flow-cashback-timing', 'flow-welcome-shop'],
+  },
+  {
+    id: 'flow-card-benefits',
+    prompt: 'What benefits come with my card?',
+    category: 'support',
+    keywords: ['benefit', 'benefits', 'perks', 'come with', 'what do i get', 'included'],
+    answer: 'Here’s what your card unlocks from day one.',
+    faqId: 'faq-benefits',
+    followUp: 'Shall I show your welcome offers, or explain how cashback is paid?',
+    followUpIds: ['flow-welcome-shop', 'flow-earn-cashback', 'flow-abroad'],
+  },
+  {
+    id: 'flow-merchants',
+    prompt: 'Which merchants offer cashback?',
+    category: 'cashback',
+    keywords: ['merchant', 'merchants', 'which stores', 'which shops', 'where can i', 'where cashback'],
+    answer: 'Cashback works across a lot of places — here’s the short version.',
+    faqId: 'faq-merchants',
+    followUp: 'Want to browse welcome offers you can activate now?',
+    followUpIds: ['flow-welcome-shop', 'flow-earn-cashback'],
+  },
+  {
+    id: 'flow-cashback-timing',
+    prompt: 'How long does cashback take to appear?',
+    category: 'support',
+    keywords: ['how long', 'when will', 'timing', 'appear', 'take to', 'credited', 'show up'],
+    answer: 'Good to check — here’s the timing.',
+    faqId: 'faq-timing',
+    followUp: 'Want to activate your first cashback offer now?',
+    followUpIds: ['flow-welcome-shop', 'flow-earn-cashback'],
+  },
+  {
+    id: 'flow-abroad',
+    prompt: 'Can I use my card abroad?',
+    category: 'support',
+    keywords: ['abroad', 'overseas', 'international', 'foreign', 'other country', 'travel with card'],
+    answer: 'Yes — your card works abroad, and it brings some travel cover with it too.',
+    faqId: 'faq-travel',
+    followUp: 'Anything else — your card benefits, or welcome offers to get started?',
+    followUpIds: ['flow-card-benefits', 'flow-welcome-shop'],
+  },
+  {
+    id: 'flow-welcome-shop',
+    prompt: 'Show me welcome offers',
+    category: 'shop',
+    keywords: ['welcome', 'first purchase', 'new member', 'get started', 'starter', 'good first buy'],
+    answer:
+      'Here are a few easy first buys — each has cashback applied, so your welcome 5% and everyday cashback stack automatically when you pay with your SMCC card.',
+    productIds: ['m-mug', 'm-tote', 'm-notebook'],
+    followUp: 'Want me to explain how the cashback is paid, or which merchants take part?',
+    followUpIds: ['flow-earn-cashback', 'flow-merchants'],
+  },
+  // ── Singapore Traveller · travel-commerce marketplace ──
+  {
+    id: 'flow-sg-todo',
+    prompt: 'Best things to do in Singapore',
+    category: 'shop',
+    keywords: ['things to do', 'do in singapore', 'attractions', 'see in singapore', 'sightseeing', 'experiences'],
+    answer:
+      'Singapore packs a lot in. Two crowd-pleasers near Marina Bay — and because you’ll pay with your SMCC card, each booking earns cashback.',
+    productIds: ['m-gardens', 'm-nightsafari'],
+    followUp: 'Want dining cashback near your hotel, or where to stay around Marina Bay?',
+    followUpIds: ['flow-sg-dining-cashback', 'flow-sg-stay', 'flow-sg-luxury'],
+  },
+  {
+    id: 'flow-sg-stay',
+    prompt: 'Where should I stay near Marina Bay?',
+    category: 'shop',
+    keywords: ['where to stay', 'stay near', 'marina bay', 'hotel near', 'accommodation'],
+    answer:
+      'You’ve already booked Marina Bay — smart base. It puts you next to Gardens by the Bay, the waterfront and the shopping malls. Your SMCC travel offers add hotel and dining cashback on top for the trip.',
+    followUp: 'Shall I line up things to do nearby, or your Singapore dining cashback?',
+    followUpIds: ['flow-sg-todo', 'flow-sg-dining-cashback'],
+  },
+  {
+    id: 'flow-sg-dining-cashback',
+    prompt: 'Can I earn cashback on dining in Singapore?',
+    category: 'cashback',
+    keywords: ['dining', 'eat', 'food', 'restaurant singapore', 'dining cashback', 'cashback dining'],
+    answer:
+      'Yes — you’ve got 10% cashback on Marina Bay dining ready to activate for your trip. Pay with your SMCC card at participating restaurants and it’s applied automatically.',
+    faqId: 'faq-cashback',
+    followUp: 'Want luxury shopping picks too, or things to do nearby?',
+    followUpIds: ['flow-sg-luxury', 'flow-sg-todo'],
+  },
+  {
+    id: 'flow-sg-luxury',
+    prompt: 'Show me luxury shopping offers in Singapore',
+    category: 'shop',
+    keywords: ['luxury', 'shopping', 'orchard', 'retail', 'designer', 'boutique'],
+    answer:
+      'Orchard Road is the place for it. A couple of standout picks with card-linked cashback — ideal as a trip souvenir.',
+    productIds: ['m-perfume', 'm-watch'],
+    followUp: 'Want travel benefits on your card, or dining cashback for the trip?',
+    followUpIds: ['flow-travel-cover', 'flow-sg-dining-cashback'],
+  },
   {
     id: 'flow-sg-outfit',
     prompt: 'Outfit ideas for my Singapore trip',
@@ -183,13 +319,13 @@ export const museFlows: MuseFlow[] = [
   },
   {
     id: 'flow-travel-cover',
-    prompt: 'Does my card cover me while travelling?',
+    prompt: 'What travel benefits do I have with my card?',
     category: 'support',
-    keywords: ['insurance', 'protection', 'cover', 'travel', 'lounge', 'abroad', 'overseas'],
+    keywords: ['insurance', 'protection', 'cover', 'travel benefit', 'travel benefits', 'lounge', 'while travelling'],
     answer: 'Good question — travel is where your card does a lot of quiet work.',
     faqId: 'faq-travel',
     followUp: 'Want lounge-ready travel picks, or your Singapore cashback?',
-    followUpIds: ['flow-sg-pack', 'flow-cashback'],
+    followUpIds: ['flow-sg-pack', 'flow-sg-dining-cashback'],
   },
   {
     id: 'flow-statement',
@@ -205,12 +341,35 @@ export const museFlows: MuseFlow[] = [
 
 /** Suggested prompt chips shown first, ordered to mix shopping and support. */
 export const museSuggestedFlowIds = [
-  'flow-sg-outfit',
-  'flow-tech',
-  'flow-cashback',
-  'flow-points',
-  'flow-travel-cover',
+  'flow-earn-cashback',
+  'flow-card-benefits',
+  'flow-merchants',
+  'flow-cashback-timing',
+  'flow-welcome-shop',
 ];
+
+/**
+ * Persona-aware suggested prompt chips. The New Cardholder leads with FAQ /
+ * support prompts, while the Singapore Traveller leads with travel commerce.
+ */
+export const museSuggestedFlowIdsByUser: Record<AppUserId, string[]> = {
+  1: [
+    'flow-earn-cashback',
+    'flow-card-benefits',
+    'flow-merchants',
+    'flow-cashback-timing',
+    'flow-abroad',
+    'flow-welcome-shop',
+  ],
+  2: [
+    'flow-sg-todo',
+    'flow-sg-stay',
+    'flow-travel-cover',
+    'flow-sg-dining-cashback',
+    'flow-sg-luxury',
+    'flow-sg-outfit',
+  ],
+};
 
 export const museFlowById = (id: string): MuseFlow | undefined =>
   museFlows.find((f) => f.id === id);
@@ -221,14 +380,11 @@ export const museFlowById = (id: string): MuseFlow | undefined =>
  */
 export function museGreeting(appUser: AppUserId, firstName: string): string {
   switch (appUser) {
-    case 3:
-      return `Hi ${firstName} 👋 I noticed your Singapore trip coming up. Want smart-casual outfit ideas for the humid weather, or a hand activating your travel cashback?`;
     case 2:
-      return `Hi ${firstName} 👋 Planning your Okinawa getaway? I can pull together warm-weather styles with cashback, or answer any question about your card.`;
-    case 4:
-      return `Hi ${firstName} 👋 It’s almost lunchtime. I can find nearby dining cashback, shop a few essentials, or help with anything on your card.`;
+      return `Hi ${firstName} 👋 I can see your Singapore trip coming up. Want the best things to do near Marina Bay, luxury shopping picks, or a hand activating your travel cashback?`;
+    case 1:
     default:
-      return `Hi ${firstName} 👋 I’m Muse, your SMCC shopping assistant. Ask me to find products with cashback, or answer a question about your card.`;
+      return `Hi ${firstName} 👋 Welcome to SMCC! You’re still in your welcome period, so I can answer any question about your card — how cashback works, your benefits, eligible merchants — or line up welcome offers to activate.`;
   }
 }
 

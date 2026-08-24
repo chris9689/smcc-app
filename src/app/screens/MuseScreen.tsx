@@ -8,11 +8,10 @@ import { Modal } from '@/components/ui/Modal';
 import { Disclaimer } from '@/components/ui/Card';
 import { formatYen } from '@/hooks/utils';
 import {
-  museFlows,
   museFaqById,
   museFlowById,
   museProductById,
-  museSuggestedFlowIds,
+  museSuggestedFlowIdsByUser,
   museGreeting,
   matchMuseFlow,
   type MuseFlow,
@@ -124,8 +123,8 @@ export function MuseScreen() {
     }
   };
 
-  const suggested = museSuggestedFlowIds
-    .map((id) => museFlows.find((f) => f.id === id))
+  const suggested = (museSuggestedFlowIdsByUser[appUser] ?? [])
+    .map((id) => museFlowById(id))
     .filter((f): f is MuseFlow => Boolean(f));
 
   const openCheckout = (p: MuseProduct) => {
@@ -297,8 +296,18 @@ export function MuseScreen() {
         {cart && !purchased && (
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3 rounded-2xl bg-surface-container-low p-3">
-              <span className="flex h-14 w-14 items-center justify-center rounded-xl brand-gradient-soft text-3xl">
+              <span className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl brand-gradient-soft text-3xl">
                 {cart.emoji}
+                {cart.image && (
+                  <img
+                    src={cart.image}
+                    alt={cart.name}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="font-heading text-sm font-bold text-ink">{cart.name}</p>
@@ -404,8 +413,18 @@ function MessageBubble({ msg, onBuy }: { msg: MuseMessage; onBuy: (p: MuseProduc
               key={p.id}
               className="flex items-center gap-3 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-3 shadow-card"
             >
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl brand-gradient-soft text-3xl">
+              <span className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl brand-gradient-soft text-3xl">
                 {p.emoji}
+                {p.image && (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
