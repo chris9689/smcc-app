@@ -275,7 +275,7 @@ export interface PresenterPersona {
   objectives: string[];
   /** Key offers surfaced for this persona. */
   keyOffers: string[];
-  /** Key Shopping Muse prompts to try for this persona. */
+  /** Key SMCC Agent prompts to try for this persona. */
   musePrompts: string[];
   /** Business-friendly "Why shown now" summary. */
   whyNow: string;

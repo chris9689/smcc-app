@@ -1,7 +1,7 @@
 /**
- * Shopping Muse — conversational marketplace + customer support data.
+ * SMCC Agent — conversational marketplace + customer support data.
  *
- * Shopping Muse is SMCC's in-app conversational assistant. It can:
+ * SMCC Agent is SMCC's in-app conversational assistant. It can:
  *  - help the customer discover products conversationally (marketplace),
  *  - surface relevant cashback on those products,
  *  - move them into a transaction without leaving the app,

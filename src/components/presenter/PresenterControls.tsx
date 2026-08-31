@@ -20,7 +20,7 @@ export function PresenterControls({ onClose }: { onClose?: () => void }) {
   const [showStory, setShowStory] = useState(false);
 
   // The New Cardholder (persona 1) has the full guided downstream chapter
-  // journey; the Traveller's story centres on Home + Shopping Muse.
+  // journey; the Traveller's story centres on Home + SMCC Agent.
   const chaptersLocked = appUser !== 1;
 
   return (

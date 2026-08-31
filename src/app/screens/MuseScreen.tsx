@@ -29,7 +29,7 @@ interface MuseMessage {
 let msgSeq = 0;
 const nextId = () => `m${++msgSeq}`;
 
-/** Chapter 7 — Shopping Muse: conversational marketplace + FAQ support. */
+/** Chapter 7 — SMCC Agent: conversational marketplace + FAQ support. */
 export function MuseScreen() {
   const { appUser, appUserProfile } = useDemo();
   const firstName = appUserProfile.name.split(' ')[0];
@@ -45,9 +45,18 @@ export function MuseScreen() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const didInit = useRef(false);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    const el = scrollRef.current;
+    if (!el) return;
+    // Keep the agent's first message in view on entry; auto-scroll only after that.
+    if (!didInit.current) {
+      didInit.current = true;
+      el.scrollTo({ top: 0 });
+      return;
+    }
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
   }, [messages, typing]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -85,6 +94,7 @@ export function MuseScreen() {
   const resetChat = () => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    didInit.current = false;
     setMessages([{ id: nextId(), role: 'muse', text: museGreeting(appUser, firstName) }]);
     setInput('');
     setTyping(false);
@@ -138,7 +148,7 @@ export function MuseScreen() {
             <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-success" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-heading text-base font-bold text-on-surface">Shopping Muse</p>
+            <p className="truncate font-heading text-base font-bold text-on-surface">SMCC Agent</p>
             <p className="truncate text-[11px] text-on-surface-variant">
               Shop with cashback · get answers
             </p>
@@ -268,9 +278,9 @@ export function MuseScreen() {
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleFreeText();
             }}
-            placeholder="Ask Muse to shop or help…"
+            placeholder="Ask SMCC Agent to shop or help…"
             className="min-w-0 flex-1 bg-transparent px-3 text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
-            aria-label="Message Shopping Muse"
+            aria-label="Message SMCC Agent"
           />
           <button
             type="button"

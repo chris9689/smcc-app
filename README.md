@@ -5,7 +5,7 @@ within the current Vpass app or as the basis for SMCC's future app.
 
 It keeps the core of the original Rakuten Card demo and adapts it for SMCC: a
 clean, modern green design; any-source offers with cashback made prominent; a
-persona whose Singapore trip reprioritises content; and **Shopping Muse**, an
+persona whose Singapore trip reprioritises content; and **SMCC Agent**, an
 in-app conversational marketplace and support assistant.
 
 This prototype is designed to feel like a real customer app, not a presentation.
@@ -37,7 +37,7 @@ npm run build
   offer, benefit, or cashback opportunity regardless of where it comes from.
 - **Cashback as offer.** Cashback is made prominent across home, offer detail,
   and Muse, with a journey to discover, transact, and benefit immediately.
-- **Shopping Muse.** A conversational marketplace + customer-support assistant
+- **SMCC Agent.** A conversational marketplace + customer-support assistant
   (Michael-Kors-style discovery). Customers can discover products
   conversationally, see relevant cashback, and check out without leaving the
   app — and ask common questions answered from SMCC FAQs. Muse also engages
@@ -51,7 +51,7 @@ npm run build
 Switch personas from the hidden presenter panel (press `P` → Persona):
 
 1. **New Cardholder** (Aoi) — recently onboarded and in the welcome period.
-   Welcome / first-purchase cashback is prioritised, and Shopping Muse leads
+   Welcome / first-purchase cashback is prioritised, and SMCC Agent leads
    with FAQ and card-support answers alongside beginner-friendly offers.
 2. **Singapore Traveller** (Kenji) — a Marina Bay hotel booking marks a
    **Singapore trip**, so the app prioritises Singapore travel, dining, and
@@ -66,7 +66,7 @@ Bottom navigation:
 
 - Home
 - Shop
-- **Muse** (Shopping Muse — center action)
+- **Muse** (SMCC Agent — center action)
 - Benefits
 - Points
 
@@ -92,12 +92,12 @@ Mock data is separated from UI under `src/mock-data` and includes:
 
 - app-user personas and their home experiences (`appUsers.ts`)
 - offers and cashback content (`offers.ts`, `appUsers.ts`)
-- Shopping Muse products, FAQs, and conversation flows (`muse.ts`)
+- SMCC Agent products, FAQs, and conversation flows (`muse.ts`)
 - points utility, loyalty, and monthly progress content
 
 ## Assumptions
 
 - Loyalty (V Point) mechanics shown are illustrative placeholders.
 - Offer availability and cashback outcomes are demo values for storytelling.
-- The Shopping Muse assistant is a deterministic, offline keyword matcher.
+- The SMCC Agent assistant is a deterministic, offline keyword matcher.
 - Programme timing and rule disclaimers are intentionally shown where needed.

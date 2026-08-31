@@ -41,7 +41,7 @@ export const appUserProfiles: Record<AppUserId, AppUserProfile> = {
       monthlyActivitiesTarget: 10,
     }),
     spendingInsight:
-      "You're in your welcome period. Activating your first cashback offer is the quickest way to start earning — and Shopping Muse can answer any question about how your card works.",
+      "You're in your welcome period. Activating your first cashback offer is the quickest way to start earning — and SMCC Agent can answer any question about how your card works.",
     offers: [
       {
         source: 'SMCC Offer',
@@ -104,8 +104,8 @@ export const appUserProfiles: Record<AppUserId, AppUserProfile> = {
       {
         source: 'SMCC Offer',
         label: 'Support on hand',
-        title: 'Shopping Muse · FAQs',
-        cta: 'New to cashback? Ask Muse how earning, timing and eligible merchants work.',
+        title: 'SMCC Agent · FAQs',
+        cta: 'New to cashback? Ask SMCC Agent how earning, timing and eligible merchants work.',
       },
     ],
     pointsNudge: {
@@ -128,7 +128,7 @@ export const appUserProfiles: Record<AppUserId, AppUserProfile> = {
         'With no meaningful spend history, personalisation leans on onboarding stage and profile signals — so welcome, first-purchase and activation offers are prioritised, alongside proactive support.',
       objectives: [
         'Show welcome & first-purchase cashback feel personalised, not generic',
-        'Demonstrate Shopping Muse answering FAQs and card questions',
+        'Demonstrate SMCC Agent answering FAQs and card questions',
         'Show support and offers coexisting in one experience',
       ],
       keyOffers: [
@@ -241,7 +241,7 @@ export const appUserProfiles: Record<AppUserId, AppUserProfile> = {
       objectives: [
         'Show travel intent dynamically changing recommendations',
         'Demonstrate multi-source offers unified (travel, dining, cashback, benefits)',
-        'Show Shopping Muse as a travel-commerce marketplace with cashback',
+        'Show SMCC Agent as a travel-commerce marketplace with cashback',
       ],
       keyOffers: [
         '10% cashback on Marina Bay dining',

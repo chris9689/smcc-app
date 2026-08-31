@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "High-fidelity clickable prototype of a personalised SMCC (Vpass) card app: any-source offers, cashback, a Singapore-travel persona, and the Shopping Muse conversational marketplace + support.",
+  "description": "High-fidelity clickable prototype of a personalised SMCC (Vpass) card app: any-source offers, cashback, a Singapore-travel persona, and the SMCC Agent conversational marketplace + support.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

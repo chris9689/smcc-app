@@ -13,7 +13,7 @@ interface Tab {
 const tabs: Tab[] = [
   { label: 'Home', icon: 'home', chapter: 1, range: [1] },
   { label: 'Shop', icon: 'shopping_bag', chapter: 2, range: [2, 3] },
-  { label: 'Muse', icon: 'auto_awesome', chapter: 7, range: [7] },
+  { label: 'AI', icon: 'auto_awesome', chapter: 7, range: [7] },
   { label: 'Cashback', icon: 'savings', chapter: 6, range: [6] },
   { label: 'Points', icon: 'account_balance_wallet', chapter: 4, range: [4, 5] },
 ];
@@ -30,7 +30,7 @@ export function BottomNav() {
       <ul className="flex items-stretch justify-between">
         {tabs.map((tab) => {
           const active = tab.range.includes(chapter);
-          const isMuse = tab.label === 'Muse';
+          const isMuse = tab.label === 'AI';
 
           if (isMuse) {
             return (

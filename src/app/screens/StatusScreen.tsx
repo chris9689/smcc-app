@@ -39,7 +39,7 @@ export function StatusScreen() {
           <SearchBar value={query} onChange={setQuery} placeholder="Search SMCC cashback & offers" />
         </section>
 
-        {/* Proactive Shopping Muse nudge — context-aware engagement */}
+        {/* Proactive SMCC Agent nudge — context-aware engagement */}
         <button
           type="button"
           onClick={() => goToChapter(7)}
@@ -49,7 +49,7 @@ export function StatusScreen() {
             <Icon name="auto_awesome" filled className="text-lg" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="font-heading text-xs font-bold text-primary">Shopping Muse</p>
+            <p className="font-heading text-xs font-bold text-primary">SMCC Agent</p>
             <p className="text-[12px] leading-snug text-on-surface">
               {museProactive[appUser] ?? museProactive[1]}
             </p>
