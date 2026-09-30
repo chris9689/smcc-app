@@ -4,14 +4,18 @@ import { useDemo } from '@/app/DemoContext';
 import { Screen } from './Screen';
 import { CardFace } from '@/components/loyalty/CardFace';
 import { SearchBar } from '@/components/shopping/SearchBar';
+import { PersonalizedFeed } from '@/components/shopping/PersonalizedFeed';
+import { CheckoutModal } from '@/components/shopping/CheckoutModal';
 import { Icon } from '@/components/ui/Icon';
 import { Disclaimer } from '@/components/ui/Card';
 import { settings } from '@/mock-data/settings';
+import type { MuseProduct } from '@/mock-data/muse';
 
 /** Chapter 1 — Home / loyalty overview. */
 export function StatusScreen() {
   const { user, goToChapter, appUser, appUserProfile, openWhy } = useDemo();
   const [query, setQuery] = useState('');
+  const [cart, setCart] = useState<MuseProduct | null>(null);
   const { offers, gridOffers, gridTitle, spendingInsight, pointsNudge } = appUserProfile;
 
   const museProactive: Record<number, string> = {
@@ -76,6 +80,23 @@ export function StatusScreen() {
             <span className="font-heading text-sm font-bold">Points</span>
           </div>
         </motion.section>
+
+        {/* For you, right now — personalised feed that re-ranks live on context */}
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-heading text-base font-bold text-on-surface">For you, right now</h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => goToChapter(2)}
+              className="shrink-0 text-sm font-semibold text-primary"
+            >
+              See All
+            </button>
+          </div>
+          <PersonalizedFeed onSelect={setCart} />
+        </section>
 
         {/* Recommended for you — the main targeted offer(s) for this app user */}
         {offers.map((offer, offerIndex) => (
@@ -303,6 +324,8 @@ export function StatusScreen() {
 
         <Disclaimer>{settings.disclaimers.illustrative}</Disclaimer>
       </div>
+
+      <CheckoutModal product={cart} onClose={() => setCart(null)} />
     </Screen>
   );
 }

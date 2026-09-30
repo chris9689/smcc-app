@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useDemo, type AppUser } from '@/app/DemoContext';
 import { appUserProfileById } from '@/mock-data/appUsers';
+import {
+  experimentReadoutByObjective,
+  objectiveMeta,
+  type Objective,
+  type WeatherCtx,
+} from '@/services/feedRanking';
 import { DemoChapterStepper } from './DemoChapterStepper';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
@@ -12,12 +18,31 @@ const appUsers: { key: AppUser; role: string; name: string }[] = ([1, 2] as AppU
   return { key: id, role: p.presenter.role, name: p.name };
 });
 
+const weatherOptions: { key: WeatherCtx; label: string; icon: string }[] = [
+  { key: 'clear', label: 'Clear', icon: 'wb_sunny' },
+  { key: 'rain', label: 'Rain', icon: 'rainy' },
+  { key: 'hot', label: 'Hot', icon: 'thermostat' },
+];
+const objectiveOptions: Objective[] = ['cashback', 'margin', 'acquisition'];
+
 /** The presenter control panel used on desktop side rail and mobile sheet. */
 export function PresenterControls({ onClose }: { onClose?: () => void }) {
-  const { toggleBehind, nextChapter, prevChapter, resetDemo, appUser, setAppUser, appUserProfile } =
-    useDemo();
+  const {
+    toggleBehind,
+    nextChapter,
+    prevChapter,
+    resetDemo,
+    appUser,
+    setAppUser,
+    appUserProfile,
+    feedContext,
+    setFeedContext,
+    objective,
+    setObjective,
+  } = useDemo();
   const presenter = appUserProfile.presenter;
   const [showStory, setShowStory] = useState(false);
+  const readout = experimentReadoutByObjective[objective];
 
   // The New Cardholder (persona 1) has the full guided downstream chapter
   // journey; the Traveller's story centres on Home + SMCC Agent.
@@ -30,7 +55,7 @@ export function PresenterControls({ onClose }: { onClose?: () => void }) {
           <p className="text-[11px] font-bold uppercase tracking-wide text-rakuten-red">
             Presenter mode
           </p>
-          <h2 className="text-lg font-extrabold text-ink">Demo controls</h2>
+          <h2 className="text-lg font-extrabold text-ink">Decisioning console</h2>
         </div>
         {onClose && (
           <button
@@ -42,6 +67,21 @@ export function PresenterControls({ onClose }: { onClose?: () => void }) {
             ✕
           </button>
         )}
+      </div>
+
+      {/* Live A/B experiment + uplift readout */}
+      <div className="flex items-center gap-2 rounded-2xl border border-ink/10 bg-ink px-3 py-2 text-white">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/15">
+          <Icon name="science" filled className="text-[15px]" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-white/60">
+            A/B live · {readout.variant}
+          </p>
+          <p className="text-xs font-bold">
+            {readout.primary} · {readout.secondary}
+          </p>
+        </div>
       </div>
 
       {/* Persona switcher — two personas */}
@@ -65,6 +105,59 @@ export function PresenterControls({ onClose }: { onClose?: () => void }) {
                 <span className={cn('text-[10px]', active ? 'text-white/70' : 'text-muted')}>
                   {m.name}
                 </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Live context — re-ranks the customer feed in real time */}
+      <div className="flex flex-col gap-2.5 rounded-2xl border border-primary/20 bg-primary/[0.04] p-3">
+        <div className="flex items-center gap-1.5">
+          <Icon name="tune" filled className="text-[15px] text-primary" />
+          <span className="text-[11px] font-bold uppercase tracking-wide text-primary">
+            Live context · re-ranks the feed
+          </span>
+        </div>
+
+        <SegRow label="Weather">
+          {weatherOptions.map((o) => (
+            <SegBtn
+              key={o.key}
+              icon={o.icon}
+              label={o.label}
+              active={feedContext.weather === o.key}
+              onClick={() => setFeedContext({ weather: o.key })}
+            />
+          ))}
+        </SegRow>
+      </div>
+
+      {/* Objective selector — re-ranks the feed for a business goal */}
+      <div className="flex flex-col gap-2 rounded-2xl border border-black/[0.08] bg-white/75 p-3">
+        <div className="flex items-center gap-1.5">
+          <Icon name="target" filled className="text-[15px] text-ink" />
+          <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
+            Optimise feed for
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-1.5">
+          {objectiveOptions.map((o) => {
+            const active = objective === o;
+            const meta = objectiveMeta[o];
+            return (
+              <button
+                key={o}
+                type="button"
+                onClick={() => setObjective(o)}
+                aria-pressed={active}
+                className={cn(
+                  'flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-center transition-colors',
+                  active ? 'bg-ink text-white' : 'bg-surface-container-low text-ink hover:bg-surface-container',
+                )}
+              >
+                <Icon name={meta.icon} filled className="text-[16px]" />
+                <span className="text-[10px] font-bold leading-tight">{meta.short}</span>
               </button>
             );
           })}
@@ -193,6 +286,44 @@ export function PresenterControls({ onClose }: { onClose?: () => void }) {
         ↺ Reset demo
       </Button>
     </div>
+  );
+}
+
+function SegRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[10px] font-bold uppercase tracking-wide text-muted">{label}</span>
+      <div className="grid grid-cols-3 gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+function SegBtn({
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: string;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        'flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 text-center transition-colors',
+        active
+          ? 'bg-primary text-white shadow-sm'
+          : 'bg-surface-container-lowest text-ink hover:bg-surface-container-low',
+      )}
+    >
+      <Icon name={icon} filled className="text-[15px]" />
+      <span className="text-[9px] font-bold leading-tight">{label}</span>
+    </button>
   );
 }
 

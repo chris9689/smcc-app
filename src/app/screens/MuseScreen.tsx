@@ -4,15 +4,17 @@ import { useDemo } from '@/app/DemoContext';
 import { Screen } from './Screen';
 import { Icon } from '@/components/ui/Icon';
 import { Disclaimer } from '@/components/ui/Card';
-import { CheckoutModal } from '@/components/shopping/CheckoutModal';
 import { formatYen } from '@/hooks/utils';
+import { feedMetaFor, formatDistance } from '@/services/feedRanking';
 import {
   museFaqById,
   museFlowById,
   museProductById,
   museSuggestedFlowIdsByUser,
+  museCategoryChipsByUser,
   museGreeting,
   matchMuseFlow,
+  vPointsFor,
   type MuseFlow,
   type MuseProduct,
 } from '@/mock-data/muse';
@@ -24,6 +26,8 @@ interface MuseMessage {
   productIds?: string[];
   faqId?: string;
   followUp?: string;
+  /** Redeem confirmation payload — closes the discover→shop→earn→redeem loop. */
+  redeemed?: { name: string; category?: string; points: number; newBalance: number };
 }
 
 let msgSeq = 0;
@@ -31,7 +35,8 @@ const nextId = () => `m${++msgSeq}`;
 
 /** Chapter 7 — SMCC Agent: conversational marketplace + FAQ support. */
 export function MuseScreen() {
-  const { appUser, appUserProfile } = useDemo();
+  const { appUser, appUserProfile, pointsBalance, addPoints, setRedeemCategory, addRedeemedProduct, goToChapter } =
+    useDemo();
   const firstName = appUserProfile.name.split(' ')[0];
 
   const [messages, setMessages] = useState<MuseMessage[]>(() => [
@@ -41,7 +46,6 @@ export function MuseScreen() {
   const [typing, setTyping] = useState(false);
   const [showChips, setShowChips] = useState(true);
   const [followUps, setFollowUps] = useState<MuseFlow[]>([]);
-  const [cart, setCart] = useState<MuseProduct | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -100,7 +104,6 @@ export function MuseScreen() {
     setTyping(false);
     setShowChips(true);
     setFollowUps([]);
-    setCart(null);
   };
 
   const handleFreeText = () => {
@@ -134,8 +137,29 @@ export function MuseScreen() {
     .map((id) => museFlowById(id))
     .filter((f): f is MuseFlow => Boolean(f));
 
-  const openCheckout = (p: MuseProduct) => {
-    setCart(p);
+  const categoryChips = museCategoryChipsByUser[appUser] ?? [];
+
+  const sendChip = (flowId: string) => {
+    const flow = museFlowById(flowId);
+    if (flow) send(flow);
+  };
+
+  // Redeem closes the loop: earn points now, and re-rank the feed by category.
+  const redeem = (p: MuseProduct) => {
+    const points = vPointsFor(p.price);
+    const newBalance = pointsBalance + points;
+    addPoints(points);
+    if (p.category) setRedeemCategory(p.category);
+    addRedeemedProduct(p.id);
+    setMessages((m) => [
+      ...m,
+      {
+        id: nextId(),
+        role: 'muse',
+        text: '',
+        redeemed: { name: p.name, category: p.category, points, newBalance },
+      },
+    ]);
   };
 
   return (
@@ -154,6 +178,16 @@ export function MuseScreen() {
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
+            <motion.span
+              key={pointsBalance}
+              initial={{ scale: 0.8, opacity: 0.6 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex items-center gap-1 rounded-full bg-secondary-fixed/60 px-2.5 py-1 text-[10px] font-bold text-secondary"
+              title="Your V Points balance"
+            >
+              <Icon name="account_balance_wallet" filled className="text-[13px]" />
+              {pointsBalance.toLocaleString()}
+            </motion.span>
             {messages.length > 1 && (
               <button
                 type="button"
@@ -171,13 +205,28 @@ export function MuseScreen() {
           </div>
         </div>
 
+        {/* Leading category chips — show what you can ask before typing */}
+        <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5">
+          {categoryChips.map((chip) => (
+            <button
+              key={chip.label}
+              type="button"
+              onClick={() => sendChip(chip.flowId)}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-primary/25 bg-surface-container-lowest px-3 py-1.5 text-xs font-bold text-primary shadow-sm transition-colors hover:bg-primary/[0.05] active:scale-95"
+            >
+              <Icon name={chip.icon} filled className="text-sm" />
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
         {/* Conversation */}
         <div
           ref={scrollRef}
           className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto no-scrollbar pb-1"
         >
           {messages.map((msg) => (
-            <MessageBubble key={msg.id} msg={msg} onBuy={openCheckout} />
+            <MessageBubble key={msg.id} msg={msg} onRedeem={redeem} onSeeFeed={() => goToChapter(1)} />
           ))}
 
           {typing && (
@@ -294,20 +343,75 @@ export function MuseScreen() {
 
         <Disclaimer>Conversational assistant is illustrative and for demonstration only.</Disclaimer>
       </div>
-
-      {/* Checkout / transaction modal */}
-      <CheckoutModal product={cart} onClose={() => setCart(null)} />
     </Screen>
   );
 }
 
 /** A single chat bubble, optionally with shoppable product cards or an FAQ card. */
-function MessageBubble({ msg, onBuy }: { msg: MuseMessage; onBuy: (p: MuseProduct) => void }) {
+function MessageBubble({
+  msg,
+  onRedeem,
+  onSeeFeed,
+}: {
+  msg: MuseMessage;
+  onRedeem: (p: MuseProduct) => void;
+  onSeeFeed: () => void;
+}) {
   const isMuse = msg.role === 'muse';
   const faq = msg.faqId ? museFaqById(msg.faqId) : undefined;
   const products = (msg.productIds ?? [])
     .map((id) => museProductById(id))
     .filter((p): p is MuseProduct => Boolean(p));
+
+  // Redeem confirmation card — the earn → redeem step made visible.
+  if (msg.redeemed) {
+    const r = msg.redeemed;
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+        className="flex w-full flex-col items-start gap-2"
+      >
+        <div className="w-[92%] overflow-hidden rounded-2xl border border-success/30 bg-success/[0.06] p-3.5 shadow-card">
+          <p className="flex items-center gap-1.5 text-xs font-bold text-success">
+            <Icon name="check_circle" filled className="text-base" />
+            Redeemed · cashback activated
+          </p>
+          <p className="mt-1.5 text-[13px] font-bold text-on-surface">{r.name}</p>
+          <div className="mt-2 flex items-center justify-between rounded-xl bg-white/70 px-3 py-2">
+            <span className="text-[11px] text-on-surface-variant">V Points earned</span>
+            <span className="font-heading text-sm font-bold text-secondary">
+              +{r.points.toLocaleString()}
+            </span>
+          </div>
+          <div className="mt-1.5 flex items-center justify-between rounded-xl bg-white/70 px-3 py-2">
+            <span className="text-[11px] text-on-surface-variant">New balance</span>
+            <motion.span
+              key={r.newBalance}
+              initial={{ scale: 0.8, opacity: 0.5 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="font-heading text-sm font-bold text-on-surface"
+            >
+              {r.newBalance.toLocaleString()} pts
+            </motion.span>
+          </div>
+          <p className="mt-2.5 flex items-center gap-1 text-[11px] text-primary">
+            <Icon name="auto_awesome" filled className="text-[13px]" />
+            Your “For you” feed just re-ranked around {r.category ?? 'this pick'}.
+          </p>
+          <button
+            type="button"
+            onClick={onSeeFeed}
+            className="mt-2 flex items-center gap-1 rounded-full bg-primary px-3.5 py-1.5 text-xs font-bold text-white transition-transform active:scale-95"
+          >
+            See it on Home
+            <Icon name="arrow_forward" className="text-sm" />
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -337,56 +441,73 @@ function MessageBubble({ msg, onBuy }: { msg: MuseMessage; onBuy: (p: MuseProduc
         </div>
       )}
 
-      {/* Shoppable product cards */}
+      {/* Shoppable product cards — full merchandising units */}
       {products.length > 0 && (
         <div className="flex w-full flex-col gap-2">
-          {products.map((p) => (
-            <div
-              key={p.id}
-              className="flex items-center gap-3 rounded-2xl border border-surface-container-high bg-surface-container-lowest p-3 shadow-card"
-            >
-              <span className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl brand-gradient-soft text-3xl">
-                {p.emoji}
-                {p.image && (
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                )}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="truncate font-heading text-sm font-bold text-on-surface">{p.name}</p>
-                  {p.tag && (
-                    <span className="shrink-0 rounded-full bg-tertiary-fixed px-1.5 py-0.5 text-[9px] font-bold text-tertiary">
-                      {p.tag}
-                    </span>
-                  )}
-                </div>
-                <p className="truncate text-[11px] text-on-surface-variant">{p.brand} · {p.blurb}</p>
-                <div className="mt-1 flex items-center gap-2">
-                  <span className="font-heading text-sm font-bold text-on-surface">
-                    {formatYen(p.price)}
-                  </span>
-                  <span className="flex items-center gap-0.5 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                    <Icon name="savings" filled className="text-[13px]" />
-                    {p.cashbackPct}% back
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onBuy(p)}
-                className="shrink-0 rounded-full bg-primary px-3.5 py-2 text-xs font-bold text-white transition-transform active:scale-95"
+          {products.map((p) => {
+            const meta = feedMetaFor(p.id);
+            return (
+              <div
+                key={p.id}
+                className="overflow-hidden rounded-2xl border border-surface-container-high bg-surface-container-lowest shadow-card"
               >
-                Buy
-              </button>
-            </div>
-          ))}
+                <div className="flex items-stretch gap-3 p-3">
+                  <span className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl brand-gradient-soft text-3xl">
+                    {p.emoji}
+                    {p.image && (
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="min-w-0 flex-1 truncate font-heading text-sm font-bold text-on-surface">{p.name}</p>
+                      {p.tag && (
+                        <span className="shrink-0 rounded-full bg-tertiary-fixed px-1.5 py-0.5 text-[9px] font-bold text-tertiary">
+                          {p.tag}
+                        </span>
+                      )}
+                      <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
+                        <Icon name="savings" filled className="text-[12px]" />
+                        {p.cashbackPct}%
+                      </span>
+                    </div>
+                    <p className="truncate text-[11px] text-on-surface-variant">{p.brand}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-on-surface-variant">
+                      <span className="flex items-center gap-0.5">
+                        <Icon name="near_me" className="text-[12px]" />
+                        {formatDistance(meta.distanceM)} away
+                      </span>
+                      <span className="flex items-center gap-0.5">
+                        <Icon name="schedule" className="text-[12px]" />
+                        {meta.expiry}
+                      </span>
+                    </div>
+                    <p className="mt-1 font-heading text-sm font-bold text-on-surface">
+                      {formatYen(p.price)}
+                      <span className="ml-1 text-[10px] font-semibold text-secondary">
+                        +{vPointsFor(p.price).toLocaleString()} pts
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onRedeem(p)}
+                  className="flex w-full items-center justify-center gap-1.5 bg-primary py-2.5 text-xs font-bold text-white transition-colors hover:bg-primary/90 active:scale-[0.98]"
+                >
+                  <Icon name="redeem" filled className="text-sm" />
+                  Redeem cashback offer
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 

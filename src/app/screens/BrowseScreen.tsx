@@ -1,35 +1,27 @@
 import { useMemo, useState } from 'react';
-import { useDemo } from '@/app/DemoContext';
 import { Screen } from './Screen';
+import { useDemo } from '@/app/DemoContext';
 import { SearchBar } from '@/components/shopping/SearchBar';
 import { CategoryTabs } from '@/components/shopping/CategoryTabs';
 import { CheckoutModal } from '@/components/shopping/CheckoutModal';
+import { PersonalizedFeed } from '@/components/shopping/PersonalizedFeed';
 import { Icon } from '@/components/ui/Icon';
 import { Disclaimer } from '@/components/ui/Card';
 import { formatYen } from '@/hooks/utils';
+import { featuredFeedIds } from '@/services/feedRanking';
 import {
   marketplaceProducts,
   marketplaceCategories,
-  recommendedProductIdsByUser,
-  museProductById,
   vPointsFor,
   type MuseProduct,
 } from '@/mock-data/muse';
 
 /** Chapter 2 — In-app marketplace: shop products and earn cashback + V Points. */
 export function BrowseScreen() {
-  const { appUser } = useDemo();
+  const { appUser, feedContext, objective, redeemedProductIds } = useDemo();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
   const [cart, setCart] = useState<MuseProduct | null>(null);
-
-  const recommended = useMemo(
-    () =>
-      (recommendedProductIdsByUser[appUser] ?? [])
-        .map(museProductById)
-        .filter((p): p is MuseProduct => Boolean(p)),
-    [appUser],
-  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -41,6 +33,13 @@ export function BrowseScreen() {
   }, [query, category]);
 
   const showRecommended = query.trim() === '' && category === 'All';
+
+  // Keep the grid free of anything already surfaced in the personalised feed.
+  const gridProducts = useMemo(() => {
+    if (!showRecommended) return filtered;
+    const featured = new Set(featuredFeedIds(appUser, feedContext.weather, objective, redeemedProductIds));
+    return filtered.filter((p) => !featured.has(p.id));
+  }, [filtered, showRecommended, appUser, feedContext.weather, objective, redeemedProductIds]);
 
   return (
     <Screen chapterId={2}>
@@ -73,36 +72,11 @@ export function BrowseScreen() {
           </p>
         </section>
 
-        {/* Persona-aware recommendations */}
-        {showRecommended && recommended.length > 0 && (
+        {/* Persona-aware recommendations — live personalised feed */}
+        {showRecommended && (
           <section className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <h3 className="font-heading text-base font-bold text-on-surface">Recommended for you</h3>
-              <span className="text-[10px] font-semibold text-muted">Based on your activity</span>
-            </div>
-            <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
-              {recommended.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setCart(p)}
-                  aria-label={`Buy ${p.name}`}
-                  className="w-36 shrink-0 overflow-hidden rounded-2xl border border-surface-container-high bg-surface-container-lowest text-left shadow-card transition-transform active:scale-95"
-                >
-                  <div className="relative">
-                    <ProductThumb product={p} className="aspect-square w-full" />
-                    <span className="absolute right-2 top-2 flex items-center gap-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
-                      <Icon name="savings" filled className="text-[12px]" />
-                      {p.cashbackPct}%
-                    </span>
-                  </div>
-                  <div className="p-2.5">
-                    <p className="line-clamp-1 font-heading text-xs font-bold text-on-surface">{p.name}</p>
-                    <p className="mt-0.5 font-heading text-sm font-bold text-primary">{formatYen(p.price)}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
+            <h3 className="font-heading text-base font-bold text-on-surface">Recommended for you</h3>
+            <PersonalizedFeed onSelect={setCart} />
           </section>
         )}
 
@@ -111,7 +85,7 @@ export function BrowseScreen() {
 
         {/* Product grid */}
         <section className="grid grid-cols-2 gap-3">
-          {filtered.map((p) => (
+          {gridProducts.map((p) => (
             <button
               key={p.id}
               type="button"

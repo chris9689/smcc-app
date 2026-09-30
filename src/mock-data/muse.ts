@@ -74,6 +74,11 @@ export const museProducts: MuseProduct[] = [
   { id: 'm-mug', name: 'Insulated travel mug', brand: 'Zojirushi', price: 3200, cashbackPct: 10, emoji: '☕', image: '/muse/mug.webp', category: 'Everyday', tag: 'New-member pick', blurb: 'Keeps coffee hot for hours — great first buy.' },
   { id: 'm-tote', name: 'Everyday canvas tote', brand: 'MUJI', price: 2900, cashbackPct: 8, emoji: '👜', image: '/muse/tote.jpg', category: 'Everyday', blurb: 'Roomy carry-all for daily errands.' },
   { id: 'm-notebook', name: 'Everyday notebook set', brand: 'Kokuyo', price: 1200, cashbackPct: 6, emoji: '📓', image: '/muse/notebook.webp', category: 'Everyday', blurb: 'Simple, sturdy daily notebooks.' },
+  // Weather / context-driven picks for the personalised feed
+  { id: 'm-cap', name: 'UV-cut running cap', brand: 'UNIQLO', price: 2400, cashbackPct: 7, emoji: '🧢', image: '/muse/cap.webp', category: 'Fashion', blurb: 'Lightweight shade for bright days out.' },
+  { id: 'm-bottle', name: 'Insulated water bottle', brand: 'Zojirushi', price: 3400, cashbackPct: 9, emoji: '🥤', image: '/muse/bottle.webp', category: 'Everyday', blurb: 'Ice-cold hydration through hot, humid days.' },
+  { id: 'm-umbrella', name: 'Compact travel umbrella', brand: 'MUJI', price: 1900, cashbackPct: 8, emoji: '☂️', image: '/muse/umbrella.webp', category: 'Everyday', blurb: 'Pocket-sized cover when the rain rolls in.' },
+  { id: 'm-sunscreen', name: 'SPF50+ sun lotion', brand: 'Biore', price: 1500, cashbackPct: 10, emoji: '🧴', image: '/muse/sunscreen.webp', category: 'Everyday', blurb: 'Non-sticky daily protection for sunny weather.' },
   // Singapore luxury retail & experiences (traveller persona)
   { id: 'm-perfume', name: 'Designer fragrance', brand: 'Orchard Road', price: 18500, cashbackPct: 8, emoji: '🧴', image: '/muse/perfume.webp', category: 'Luxury', tag: 'Luxury', blurb: 'A duty-friendly luxury pick on Orchard Road.' },
   { id: 'm-watch', name: 'Minimalist travel watch', brand: 'ION Orchard', price: 42000, cashbackPct: 6, emoji: '⌚', image: '/muse/watch.webp', category: 'Luxury', tag: 'Luxury', blurb: 'A refined souvenir from Singapore retail.' },
@@ -392,6 +397,35 @@ export const museSuggestedFlowIdsByUser: Record<AppUserId, string[]> = {
 
 export const museFlowById = (id: string): MuseFlow | undefined =>
   museFlows.find((f) => f.id === id);
+
+/** A leading, guided category chip that maps to a starter flow. */
+export interface MuseCategoryChip {
+  label: string;
+  icon: string;
+  flowId: string;
+}
+
+/**
+ * Persona-aware leading category chips shown before the customer types, so
+ * they immediately see what they can ask (Offers / Cashback / Points / Nearby /
+ * Travel) rather than facing a blank composer.
+ */
+export const museCategoryChipsByUser: Record<AppUserId, MuseCategoryChip[]> = {
+  1: [
+    { label: 'Offers', icon: 'local_offer', flowId: 'flow-welcome-shop' },
+    { label: 'Cashback', icon: 'savings', flowId: 'flow-earn-cashback' },
+    { label: 'Points', icon: 'account_balance_wallet', flowId: 'flow-points' },
+    { label: 'Nearby', icon: 'near_me', flowId: 'flow-merchants' },
+    { label: 'Travel', icon: 'flight', flowId: 'flow-abroad' },
+  ],
+  2: [
+    { label: 'Offers', icon: 'local_offer', flowId: 'flow-sg-luxury' },
+    { label: 'Cashback', icon: 'savings', flowId: 'flow-sg-dining-cashback' },
+    { label: 'Points', icon: 'account_balance_wallet', flowId: 'flow-points' },
+    { label: 'Nearby', icon: 'near_me', flowId: 'flow-sg-todo' },
+    { label: 'Travel', icon: 'flight', flowId: 'flow-travel-cover' },
+  ],
+};
 
 /**
  * Persona-aware proactive opening message. Demonstrates Muse proactively

@@ -48,18 +48,20 @@ export function AppShell() {
           <MobileFrame>
             <HeaderBar />
 
-            <AnimatePresence mode="wait">
-              <motion.main
-                key={chapter}
-                variants={screenVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="flex flex-1 flex-col overflow-hidden"
-              >
-                <Screen />
-              </motion.main>
-            </AnimatePresence>
+            {/*
+             * Enter-on-mount only (no AnimatePresence) for the screen swap:
+             * mode="wait" hangs when the exiting screen holds `layout` motion
+             * children (the personalised feed), which would blank the screen.
+             */}
+            <motion.main
+              key={chapter}
+              variants={screenVariants}
+              initial="initial"
+              animate="animate"
+              className="flex flex-1 flex-col overflow-hidden"
+            >
+              <Screen />
+            </motion.main>
 
             <BottomNav />
           </MobileFrame>

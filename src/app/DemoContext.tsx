@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -9,6 +10,7 @@ import {
 import type { PersonaState, User, LoyaltyStatus, AppUserId, AppUserProfile } from '@/types';
 import { hanako } from '@/mock-data/users';
 import { appUserProfileById } from '@/mock-data/appUsers';
+import { defaultFeedContext, type FeedContext, type Objective } from '@/services/feedRanking';
 import { totalChapters } from './chapters';
 
 /** Selectable app-user profiles for the different home experiences. */
@@ -60,6 +62,23 @@ interface DemoContextValue {
   acceptOffer: () => void;
   resetOffer: () => void;
 
+  /** Presenter-mode context that re-ranks the feed live (time/location/weather). */
+  feedContext: FeedContext;
+  setFeedContext: (patch: Partial<FeedContext>) => void;
+  /** Optimisation objective the ranker maximises for (console selector). */
+  objective: Objective;
+  setObjective: (o: Objective) => void;
+
+  /** Live, mutable V Points balance — updates when the customer redeems. */
+  pointsBalance: number;
+  addPoints: (n: number) => void;
+  /** Category of the most recent redeem, used to re-rank the feed around it. */
+  redeemCategory: string | null;
+  setRedeemCategory: (c: string | null) => void;
+  /** Ids of products redeemed via Muse, newest last — drives the feed spotlight. */
+  redeemedProductIds: string[];
+  addRedeemedProduct: (id: string) => void;
+
   /** Reset the whole demo back to its initial state. */
   resetDemo: () => void;
 }
@@ -74,6 +93,29 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [behindOpen, setBehindOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [offerAccepted, setOfferAccepted] = useState(false);
+  const [feedContext, setFeedContextState] = useState<FeedContext>(defaultFeedContext);
+  const [objective, setObjective] = useState<Objective>('cashback');
+  const [pointsBalance, setPointsBalance] = useState(() => appUserProfileById(appUser).pointsBalance);
+  const [redeemCategory, setRedeemCategory] = useState<string | null>(null);
+  const [redeemedProductIds, setRedeemedProductIds] = useState<string[]>([]);
+
+  // Reset the live balance and any redeem-based re-rank when the persona changes.
+  useEffect(() => {
+    setPointsBalance(appUserProfileById(appUser).pointsBalance);
+    setRedeemCategory(null);
+    setRedeemedProductIds([]);
+  }, [appUser]);
+
+  const setFeedContext = useCallback(
+    (patch: Partial<FeedContext>) => setFeedContextState((c) => ({ ...c, ...patch })),
+    [],
+  );
+  const addPoints = useCallback((n: number) => setPointsBalance((b) => b + n), []);
+  const addRedeemedProduct = useCallback(
+    (id: string) => setRedeemedProductIds((ids) => [...ids, id]),
+    [],
+  );
+
   const goToChapter = useCallback((id: number) => {
     setChapter(Math.min(Math.max(1, id), totalChapters));
   }, []);
@@ -102,6 +144,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     setReplayToken((t) => t + 1);
     setWhyOpen(false);
     setOfferAccepted(false);
+    setFeedContextState(defaultFeedContext);
+    setObjective('cashback');
+    setPointsBalance(appUserProfileById(1).pointsBalance);
+    setRedeemCategory(null);
+    setRedeemedProductIds([]);
   }, []);
 
   // The card is always connected in this build.
@@ -114,9 +161,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     () => ({
       ...hanako,
       linkedHappyProgram: true,
-      pointsBalance: appUserProfile.pointsBalance,
+      pointsBalance,
     }),
-    [appUserProfile.pointsBalance],
+    [pointsBalance],
   );
 
   const loyalty = appUserProfile.loyalty;
@@ -147,6 +194,16 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     offerAccepted,
     acceptOffer,
     resetOffer,
+    feedContext,
+    setFeedContext,
+    objective,
+    setObjective,
+    pointsBalance,
+    addPoints,
+    redeemCategory,
+    setRedeemCategory,
+    redeemedProductIds,
+    addRedeemedProduct,
     resetDemo,
   };
 
