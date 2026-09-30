@@ -418,9 +418,12 @@ const defaultSpotlightHeadline: Record<Objective, string> = {
 };
 
 /**
- * Predefined "goes-with" spotlight per redeemed product — a simple lookup table
- * (no learned logic) so redeeming in Muse visibly re-ranks the feed on return.
- * Extra candidates give a fallback when the first pick is already shown above.
+ * Predefined "goes-with" spotlight per redeemed product — a simple, explicit
+ * rule set (no learned logic) so redeeming in Muse always re-ranks the feed on
+ * return to Home. The FIRST id in each pool is the guaranteed "product B": it is
+ * pinned to the top of the spotlight and reserved before the weather group so
+ * it is never cannibalised. Every redeemable product has an entry so a visible
+ * change always happens.
  */
 const postRedeemSpotlight: Record<string, { headline: string; icon: string; pool: string[] }> = {
   'm-sunglasses': { headline: 'Complete your sunny-day kit', icon: 'wb_sunny', pool: ['m-cap', 'm-sunscreen', 'm-bottle'] },
@@ -430,12 +433,18 @@ const postRedeemSpotlight: Record<string, { headline: string; icon: string; pool
   'm-umbrella': { headline: 'Stay dry and ready', icon: 'umbrella', pool: ['m-tote', 'm-powerbank', 'm-notebook'] },
   'm-mug': { headline: 'For your daily coffee run', icon: 'local_cafe', pool: ['m-tote', 'm-notebook', 'm-bottle'] },
   'm-tote': { headline: 'Everyday carry picks', icon: 'shopping_bag', pool: ['m-notebook', 'm-powerbank', 'm-mug'] },
+  'm-notebook': { headline: 'Complete your everyday desk kit', icon: 'edit_note', pool: ['m-mug', 'm-tote', 'm-powerbank'] },
+  'm-sneakers': { headline: 'Gear up for long days out', icon: 'directions_walk', pool: ['m-polo', 'm-cap', 'm-bottle'] },
+  'm-blazer': { headline: 'Complete the smart-casual look', icon: 'checkroom', pool: ['m-sneakers', 'm-watch', 'm-sunglasses'] },
+  'm-powerbank': { headline: 'Power up your day kit', icon: 'bolt', pool: ['m-earbuds', 'm-adapter', 'm-carryon'] },
   // Traveller (Kenji) complements
   'm-carryon': { headline: 'Pack smart for your trip', icon: 'luggage', pool: ['m-adapter', 'm-powerbank', 'm-earbuds'] },
   'm-adapter': { headline: 'Trip tech that goes with it', icon: 'bolt', pool: ['m-powerbank', 'm-earbuds', 'm-carryon'] },
   'm-earbuds': { headline: 'Sorted for the flight', icon: 'headphones', pool: ['m-powerbank', 'm-adapter', 'm-blazer'] },
   'm-perfume': { headline: 'More Orchard Road luxury', icon: 'diamond', pool: ['m-watch', 'm-blazer', 'm-sunglasses'] },
   'm-watch': { headline: 'Finish the look', icon: 'diamond', pool: ['m-perfume', 'm-blazer', 'm-sunglasses'] },
+  'm-gardens': { headline: 'Make a day of it in Singapore', icon: 'photo_camera', pool: ['m-sunglasses', 'm-cap', 'm-sneakers'] },
+  'm-nightsafari': { headline: 'Set for your night out', icon: 'dark_mode', pool: ['m-earbuds', 'm-powerbank', 'm-sneakers'] },
 };
 
 /** Build a feed item straight from a product id, reusing its authored metadata. */
@@ -468,14 +477,19 @@ function objectiveRank(product: MuseProduct, meta: FeedMeta, objective: Objectiv
   return cb * 4;
 }
 
-/** Pick the top `n` products from a pool for the current objective. */
+/**
+ * Pick the top `n` products from a pool for the current objective. When
+ * `pinnedFirst` is supplied and still available, it is always placed first
+ * regardless of objective ranking — used to guarantee the redeem “product B”.
+ */
 function pickForObjective(
   pool: string[],
   objective: Objective,
   exclude: Set<string>,
   n: number,
+  pinnedFirst?: string,
 ): RankedFeedItem[] {
-  return pool
+  const ranked = pool
     .map((id) => {
       const product = museProductById(id);
       if (!product || exclude.has(id)) return null;
@@ -485,9 +499,11 @@ function pickForObjective(
       return { item, rank: objectiveRank(product, meta, objective) };
     })
     .filter((x): x is { item: RankedFeedItem; rank: number } => x !== null)
-    .sort((a, b) => b.rank - a.rank)
-    .slice(0, n)
-    .map((x) => x.item);
+    .sort((a, b) => b.rank - a.rank);
+
+  const pinned = pinnedFirst ? ranked.find((x) => x.item.product.id === pinnedFirst) : undefined;
+  const ordered = pinned ? [pinned, ...ranked.filter((x) => x !== pinned)] : ranked;
+  return ordered.slice(0, n).map((x) => x.item);
 }
 
 /**
@@ -504,16 +520,29 @@ export function buildFeedGroups(
 ): FeedGroup[] {
   const used = new Set<string>();
 
+  const lastRedeemed = redeemedProductIds[redeemedProductIds.length - 1];
+  const redeem = lastRedeemed ? postRedeemSpotlight[lastRedeemed] : undefined;
+
+  // After a redeem, build the “goes-with” spotlight FIRST and reserve its picks
+  // (pinning “product B” = pool[0]) so the weather group above can't consume
+  // them — guaranteeing a visible change when the customer returns to Home.
+  let spotItems: RankedFeedItem[] = [];
+  if (redeem) {
+    used.add(lastRedeemed); // don't re-surface what was just redeemed
+    spotItems = pickForObjective(redeem.pool, objective, used, 2, redeem.pool[0]);
+    spotItems.forEach((i) => used.add(i.product.id));
+  }
+
   const wa = weatherAreasByUser[appUser][weather];
   const weatherItems = pickForObjective(wa.pool, objective, used, 2);
   weatherItems.forEach((i) => used.add(i.product.id));
 
-  const lastRedeemed = redeemedProductIds[redeemedProductIds.length - 1];
-  const redeem = lastRedeemed ? postRedeemSpotlight[lastRedeemed] : undefined;
-  const spotPool = redeem ? redeem.pool : defaultSpotlightByUser[appUser].pool;
+  if (!redeem) {
+    spotItems = pickForObjective(defaultSpotlightByUser[appUser].pool, objective, used, 2);
+  }
+
   const spotHeadline = redeem ? redeem.headline : defaultSpotlightHeadline[objective];
   const spotIcon = redeem ? redeem.icon : defaultSpotlightByUser[appUser].icon;
-  const spotItems = pickForObjective(spotPool, objective, used, 2);
 
   return [
     { id: 'weather', headline: wa.headline, icon: wa.icon, items: weatherItems },
